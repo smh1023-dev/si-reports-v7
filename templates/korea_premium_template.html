@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>에스아이스토리 KR 프리미엄 — {{ date_str }}</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+:root{--bg:#090909;--bg2:#141414;--bg3:#1c1c1c;--bg4:#262626;
+  --gold:#d4b25e;--gold2:#ecd092;--gb:rgba(212,178,94,.28);
+  --white:#f5f1e8;--gray:#b8b3a4;
+  --green:#4ade80;--red:#f06b6a;--blue:#7ab0ff}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{background:var(--bg);color:var(--white);
+  font-family:'Pretendard Variable','Pretendard',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif;
+  font-weight:400;letter-spacing:-.01em;-webkit-font-smoothing:antialiased}
+a{color:var(--gold2);text-decoration:none}
+
+nav{display:flex;align-items:center;justify-content:space-between;padding:.95rem 2rem;
+  border-bottom:1px solid rgba(212,178,94,.18);background:rgba(9,9,9,.97);
+  position:sticky;top:0;z-index:100;flex-wrap:wrap;gap:.6rem}
+.logo{font-family:'Pretendard Variable','Pretendard',sans-serif;font-size:1.35rem;font-weight:700;color:var(--gold2);letter-spacing:.02em}
+.logo span{font-weight:400;color:var(--white)}
+.premium-badge{background:linear-gradient(135deg,#c9a84c,#e8c97a);color:#111;font-size:.62rem;
+  font-weight:600;letter-spacing:.14em;padding:3px 8px;border-radius:2px;margin-left:.4rem;vertical-align:middle}
+.flag-badge{background:rgba(122,176,255,.18);color:#7ab0ff;font-size:.7rem;font-weight:600;
+  padding:3px 8px;border-radius:2px;margin-left:.4rem;vertical-align:middle;border:1px solid rgba(122,176,255,.35)}
+.report-date{font-size:.86rem;color:var(--gray)}
+.badge{display:inline-block;margin-left:.6rem;padding:2px 8px;background:rgba(74,222,128,.14);
+  border:1px solid rgba(74,222,128,.35);border-radius:2px;font-size:.74rem;color:#4ade80;font-weight:500}
+
+.tabs{display:flex;border-bottom:1px solid rgba(212,178,94,.18);background:var(--bg2);padding:0 2rem;overflow-x:auto}
+.tab{font-size:.88rem;padding:.95rem 1.1rem;font-weight:500;cursor:pointer;
+  color:var(--gray);border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap}
+.tab:hover{color:var(--gold2)}
+.tab.active{color:var(--gold2);border-bottom-color:var(--gold)}
+
+.page{display:none;padding:2rem;max-width:1300px;margin:0 auto}
+.page.active{display:block}
+
+.sec-label{font-size:.8rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold2);margin-bottom:.6rem;font-weight:500}
+.sec-title{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:400;margin-bottom:.5rem}
+.sec-title em{font-style:italic;color:var(--gold2)}
+.sec-sub{font-size:.96rem;color:var(--gray);line-height:1.75;margin-bottom:1.6rem}
+
+.card{background:var(--bg2);border:1px solid rgba(212,178,94,.2);padding:1.3rem;margin-bottom:1.3rem;border-radius:3px}
+.card-title{font-size:.86rem;letter-spacing:.08em;color:var(--gold2);margin-bottom:1rem;font-weight:600}
+
+.mkt-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1px;
+  background:var(--gb);border:1px solid var(--gb);margin-bottom:1.3rem;border-radius:3px;overflow:hidden}
+.mkt-card{background:var(--bg2);padding:1.1rem .9rem;text-align:center}
+.mkt-name{font-size:.82rem;color:var(--white);margin-bottom:.25rem;font-weight:500}
+.mkt-sub{font-size:.7rem;color:var(--gray);margin-bottom:.4rem}
+.mkt-val{font-family:'DM Mono',monospace;font-size:1.15rem;color:var(--white);font-weight:500}
+.mkt-chg{font-size:.92rem;margin-top:.3rem;font-weight:500;font-family:'DM Mono',monospace}
+.up{color:var(--green)}.down{color:var(--red)}
+
+.mkt-interpret{background:var(--bg3);border-left:3px solid var(--gold);padding:1rem 1.2rem;
+  font-size:.98rem;color:var(--white);line-height:1.75;margin-bottom:1.3rem;border-radius:2px}
+
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+th{font-size:.74rem;color:var(--gold2);padding:.7rem .5rem;text-align:left;
+  border-bottom:1px solid rgba(212,178,94,.25);white-space:nowrap;font-weight:600}
+td{padding:.72rem .5rem;border-bottom:1px solid rgba(212,178,94,.08);color:var(--white);white-space:nowrap}
+.ticker{font-family:'DM Mono',monospace;color:var(--gold2);font-weight:600}
+
+.verdict{font-size:.72rem;padding:3px 9px;font-weight:500;border-radius:2px;display:inline-block}
+.v-watch{background:rgba(74,222,128,.14);color:var(--green);border:1px solid rgba(74,222,128,.35)}
+.v-hold{background:rgba(212,178,94,.14);color:var(--gold2);border:1px solid var(--gb)}
+.v-fail{background:rgba(240,107,106,.14);color:var(--red);border:1px solid rgba(240,107,106,.3)}
+
+.score-cell{font-family:'DM Mono',monospace;font-weight:600}
+.score-hi{color:var(--green)}.score-md{color:var(--gold2)}.score-lo{color:var(--red)}
+
+.top3-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.6rem}
+.top3-card{border:1px solid rgba(212,178,94,.35);background:linear-gradient(180deg,#1a1610 0%,var(--bg2) 100%);
+  padding:1.5rem;border-radius:4px;position:relative}
+.top3-rank{position:absolute;top:1rem;right:1.2rem;font-family:'Cormorant Garamond',serif;
+  font-size:3rem;color:rgba(212,178,94,.35);line-height:1;font-weight:400}
+.top3-ticker{font-family:'DM Mono',monospace;font-size:1.4rem;color:var(--gold2);font-weight:700;margin-bottom:.3rem}
+.top3-name{font-size:.92rem;color:var(--white);margin-bottom:.8rem}
+.top3-score{font-family:'Cormorant Garamond',serif;font-size:2.4rem;color:var(--green);font-weight:600;line-height:1;margin:.5rem 0}
+.top3-label{font-size:.74rem;color:var(--gray);letter-spacing:.08em;text-transform:uppercase;margin-bottom:.3rem}
+.top3-meta{display:flex;flex-direction:column;gap:.4rem;margin-top:1rem;padding-top:1rem;border-top:1px solid rgba(212,178,94,.15)}
+.top3-meta-row{display:flex;justify-content:space-between;font-size:.84rem}
+
+/* 점수 분해 막대 */
+.score-breakdown{margin:1rem 0;padding:1rem;background:var(--bg3);border-radius:3px}
+.score-bar-row{display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem;font-size:.82rem}
+.score-bar-label{color:var(--gray);width:70px;flex-shrink:0}
+.score-bar-track{flex:1;background:var(--bg);height:8px;border-radius:4px;overflow:hidden}
+.score-bar-fill{height:100%;background:linear-gradient(90deg,var(--gold) 0%,var(--gold2) 100%);border-radius:4px}
+.score-bar-val{font-family:'DM Mono',monospace;color:var(--white);width:55px;text-align:right;font-size:.8rem}
+
+/* AI 요약 박스 */
+.ai-summary{background:linear-gradient(135deg,rgba(212,178,94,0.06) 0%,rgba(240,107,106,0.05) 100%);
+  border:1px solid rgba(212,178,94,0.25);border-radius:4px;
+  padding:1rem 1.1rem;margin:1rem 0}
+.ai-summary-label{font-size:.72rem;letter-spacing:.12em;color:var(--gold2);font-weight:600;margin-bottom:.5rem;text-transform:uppercase}
+.ai-summary-text{font-size:.92rem;color:var(--white);line-height:1.7}
+
+.dam-logic{background:var(--bg3);border-left:3px solid var(--gold2);
+  padding:.8rem 1rem;margin:.8rem 0;border-radius:2px}
+.dam-logic-label{font-size:.7rem;letter-spacing:.1em;color:var(--gold2);font-weight:600;margin-bottom:.3rem}
+.dam-logic-text{font-size:.84rem;color:var(--white);line-height:1.6;font-style:italic}
+
+.story-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-top:1rem;padding-top:1rem;border-top:1px solid rgba(212,178,94,.15)}
+.story-cell{padding:.6rem .7rem;background:var(--bg3);border-left:2px solid var(--gold);border-radius:2px}
+.story-icon{font-size:.78rem;color:var(--gold2);font-weight:600;margin-bottom:.25rem}
+.story-text{font-size:.78rem;color:var(--white);line-height:1.5}
+.story-text.dim{color:var(--gray)}
+.check-pass{color:var(--green)}
+.check-fail{color:var(--red)}
+.check-warn{color:var(--gold2)}
+
+.risk-pills{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.8rem}
+.risk-pill{padding:3px 9px;background:var(--bg3);border:1px solid var(--gb);border-radius:10px;
+  font-size:.72rem;color:var(--white);font-family:'DM Mono',monospace}
+.risk-pill .lbl{color:var(--gray);margin-right:.3rem}
+.top3-meta-label{color:var(--gray)}
+.top3-meta-value{color:var(--white);font-family:'DM Mono',monospace}
+.top3-story{font-size:.86rem;color:var(--gold2);margin-top:.6rem;font-style:italic}
+
+.market-tabs{display:flex;gap:.5rem;margin-bottom:1rem;border-bottom:1px solid rgba(212,178,94,.15)}
+.market-tab{padding:.6rem 1rem;font-size:.86rem;cursor:pointer;color:var(--gray);border-bottom:2px solid transparent;font-weight:500}
+.market-tab:hover{color:var(--gold2)}
+.market-tab.active{color:var(--gold2);border-bottom-color:var(--gold)}
+
+.highlight-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin-bottom:1.6rem}
+.highlight-card{background:var(--bg2);border:1px solid rgba(212,178,94,.2);border-radius:3px;overflow:hidden}
+.highlight-head{padding:.9rem 1.1rem;background:linear-gradient(135deg,#1a1610 0%,#221b10 100%);border-bottom:1px solid rgba(212,178,94,.15)}
+.highlight-title{font-size:.94rem;color:var(--gold2);font-weight:600;margin-bottom:.2rem}
+.highlight-desc{font-size:.78rem;color:var(--gray)}
+
+.stats{display:flex;gap:1rem;margin-bottom:1.6rem;flex-wrap:wrap}
+.stat{background:var(--bg2);border:1px solid rgba(212,178,94,.15);padding:.8rem 1.1rem;border-radius:3px;min-width:140px}
+.stat-label{font-size:.76rem;color:var(--gray);margin-bottom:.3rem}
+.stat-value{font-family:'DM Mono',monospace;font-size:1.15rem;color:var(--white);font-weight:600}
+
+.alloc-row{display:flex;height:48px;border-radius:3px;overflow:hidden;margin:1rem 0}
+.alloc-seg{display:flex;align-items:center;justify-content:center;font-size:.88rem;font-weight:600}
+.alloc-stock{background:linear-gradient(135deg,#4ade80,#22c55e);color:#0f3a1f}
+.alloc-gold{background:linear-gradient(135deg,#ecd092,#d4b25e);color:#3a2e0f}
+.alloc-cash{background:linear-gradient(135deg,#7ab0ff,#5b9cf6);color:#0f1f3a}
+
+.text-box{background:var(--bg3);border:1px solid rgba(212,178,94,.18);padding:1.3rem;
+  font-family:'DM Mono',monospace;font-size:.86rem;line-height:1.85;
+  white-space:pre-wrap;color:var(--white);border-radius:3px}
+
+.copy-btn{background:transparent;border:1px solid var(--gb);color:var(--gold2);
+  padding:.55rem 1.2rem;font-size:.84rem;letter-spacing:.04em;font-weight:500;
+  cursor:pointer;margin-top:1rem;border-radius:2px;
+  font-family:'Pretendard Variable','Pretendard',sans-serif}
+.copy-btn:hover{background:rgba(212,178,94,.12)}
+
+.disc{font-size:.86rem;color:var(--gray);line-height:1.85;padding:1.6rem 2rem;
+  border-top:1px solid rgba(212,178,94,.12);text-align:center}
+
+@media(max-width:900px){.top3-grid{grid-template-columns:1fr}.highlight-grid{grid-template-columns:1fr}}
+@media(max-width:700px){.page{padding:1.2rem}.sec-title{font-size:1.6rem}nav{padding:.8rem 1rem}.tabs{padding:0 1rem}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">에스아이<span> 스토리</span><span class="flag-badge" style="background:rgba(240,107,106,.18);color:#f06b6a;border-color:rgba(240,107,106,.35)">🇰🇷 KR</span><span class="premium-badge">PREMIUM</span></div>
+  <div class="report-date">{{ timestamp_str }}<span class="badge">매일 아침 갱신</span></div>
+</nav>
+
+<div class="tabs">
+  <div class="tab active" onclick="tab('market',this)">시장 요약</div>
+  <div class="tab" onclick="tab('top3',this)">TOP 3</div>
+  <div class="tab" onclick="tab('top10',this)">TOP 10</div>
+  <div class="tab" onclick="tab('highlights',this)">하이라이트</div>
+  <div class="tab" onclick="tab('full',this)">전체 후보</div>
+  <div class="tab" onclick="tab('risk',this)">리스크 지표</div>
+  <div class="tab" onclick="tab('allocation',this)">자산 배분</div>
+  <div class="tab" onclick="tab('kakao',this)">카카오톡</div>
+  <div class="tab" onclick="tab('blog',this)">블로그</div>
+</div>
+
+<!-- 시장 요약 -->
+<div class="page active" id="page-market">
+  <div class="sec-label">오늘의 시장</div>
+  <div class="sec-title">🇰🇷 한국 시황 <em>스냅샷</em></div>
+  <div class="sec-sub">미국·한국 주요 지수와 환율 어제 종가 기준 등락. 데이터 출처: Yahoo Finance</div>
+
+  {% for grp_key, grp_title in [('us_index','🇺🇸 미국 지수'),('kr_index','🇰🇷 한국 지수'),('etf','📊 주요 ETF'),('macro','🌐 매크로 · 환율')] %}
+    {% if market[grp_key] %}
+    <div class="card">
+      <div class="card-title">{{ grp_title }}</div>
+      <div class="mkt-grid">
+        {% for m in market[grp_key] %}
+        <div class="mkt-card">
+          <div class="mkt-name">{{ m.label }}</div>
+          <div class="mkt-sub">{{ m.ticker }}</div>
+          <div class="mkt-val">{{ m.value_str }}</div>
+          <div class="mkt-chg {{ 'up' if m.change_pct >= 0 else 'down' }}">
+            {{ '+' if m.change_pct >= 0 else '' }}{{ '%.2f'|format(m.change_pct) }}%
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  {% endfor %}
+
+  <div class="mkt-interpret">{{ market_interpret }}</div>
+
+  <div class="stats">
+    <div class="stat"><div class="stat-label">분석 종목</div><div class="stat-value">{{ stats.krx_loaded }} / {{ stats.krx_total }}</div></div>
+    <div class="stat"><div class="stat-label">200일선 위</div><div class="stat-value">{{ stats.krx_above_200 }}</div></div>
+  </div>
+</div>
+
+<!-- TOP 3 -->
+<div class="page" id="page-top3">
+  <div class="sec-label">최종 선정</div>
+  <div class="sec-title">한국 <em>TOP 3</em> 관심 종목</div>
+  <div class="sec-sub">기술적 추세 + 거래량·52주 위치를 합산한 종합 점수 최상위 3개. 200일선 위에서 형성된 관심 판정 종목만 선정됩니다.</div>
+
+  {% if top3 %}
+  <div class="top3-grid">
+    {% for r in top3 %}
+    {% set st = stories.get(r.ticker, {}) %}
+    <div class="top3-card">
+      <div class="top3-rank">{{ loop.index }}</div>
+      <div class="top3-label">Ticker</div>
+      <div class="top3-ticker">{{ r.ticker }}</div>
+      <div class="top3-name">{{ r.name }} · {{ r.sector }}</div>
+
+      <div class="top3-label">종합 점수</div>
+      <div class="top3-score">{{ '%.0f'|format(r.combined_score) }}</div>
+
+      <div class="score-breakdown">
+        <div style="font-size:.74rem;color:var(--gold2);margin-bottom:.6rem;letter-spacing:.06em">📊 점수 분해 (기술)</div>
+        <div class="score-bar-row">
+          <div class="score-bar-label">추세</div>
+          <div class="score-bar-track"><div class="score-bar-fill" style="width:{{ (r.score_trend/32*100)|round }}%"></div></div>
+          <div class="score-bar-val">{{ r.score_trend }}/32</div>
+        </div>
+        <div class="score-bar-row">
+          <div class="score-bar-label">모멘텀</div>
+          <div class="score-bar-track"><div class="score-bar-fill" style="width:{{ (r.score_momentum/20*100)|round }}%"></div></div>
+          <div class="score-bar-val">{{ r.score_momentum }}/20</div>
+        </div>
+        <div class="score-bar-row">
+          <div class="score-bar-label">거래량</div>
+          <div class="score-bar-track"><div class="score-bar-fill" style="width:{{ (r.score_volume/15*100)|round }}%"></div></div>
+          <div class="score-bar-val">{{ r.score_volume }}/15</div>
+        </div>
+        <div class="score-bar-row">
+          <div class="score-bar-label">52주위치</div>
+          <div class="score-bar-track"><div class="score-bar-fill" style="width:{{ (r.score_position_52w/15*100)|round }}%"></div></div>
+          <div class="score-bar-val">{{ r.score_position_52w }}/15</div>
+        </div>
+      </div>
+
+      {% if st.get('thesis') %}
+      <div class="ai-summary">
+        <div class="ai-summary-label">📖 Damodaran 투자 논리</div>
+        <div class="ai-summary-text">{{ st.get('thesis') }}</div>
+      </div>
+      {% endif %}
+
+      <div class="story-grid">
+        <div class="story-cell">
+          <div class="story-icon">🛡️ 해자 (Moat)</div>
+          <div class="story-text">{{ st.get('moat', '데이터 부족') }}</div>
+        </div>
+        <div class="story-cell">
+          <div class="story-icon">📈 성장 동인</div>
+          <div class="story-text">{{ st.get('growth', '데이터 부족') }}</div>
+        </div>
+        <div class="story-cell">
+          <div class="story-icon">⚠️ 리스크 요인</div>
+          <div class="story-text">{{ st.get('risk', '검토 필요') }}</div>
+        </div>
+        <div class="story-cell">
+          <div class="story-icon">🚀 메가트렌드</div>
+          <div class="story-text">{{ st.get('megatrend', '검토 필요') }}</div>
+        </div>
+      </div>
+
+      <div class="story-grid">
+        <div class="story-cell">
+          <div class="story-icon">📊 위험 변화 (정량)</div>
+          <div class="story-text">
+            {% set rc = st.get('risk_change', {}) %}
+            <strong class="{{ 'check-pass' if rc.get('score',0) >= 2 else 'check-warn' if rc.get('score',0) == 1 else 'check-fail' }}">{{ rc.get('verdict', '—') }}</strong><br>
+            <span class="dim">{{ rc.get('signals', '') }}</span>
+          </div>
+        </div>
+        <div class="story-cell">
+          <div class="story-icon">📈 추세 강도</div>
+          <div class="story-text">
+            <strong class="{{ 'check-pass' if r.return_6m >= 10 else 'check-warn' if r.return_6m >= 0 else 'check-fail' }}">
+              {% if r.return_6m >= 10 %}강세{% elif r.return_6m >= 0 %}중립{% else %}약세{% endif %}
+            </strong><br>
+            <span class="dim">6M {{ '%+.1f'|format(r.return_6m) }}% · 변동성 {{ '%.0f'|format(r.volatility_20d) }}%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="risk-pills">
+        <div class="risk-pill"><span class="lbl">MDD</span>{{ r.mdd_str }}</div>
+        <div class="risk-pill"><span class="lbl">샤프</span>{{ r.sharpe_str }}</div>
+        <div class="risk-pill"><span class="lbl">베타</span>{{ r.beta_str }}</div>
+        <div class="risk-pill"><span class="lbl">VaR95</span>{{ r.var_95_str }}</div>
+        <div class="risk-pill"><span class="lbl">리스크</span>{{ r.risk_score_str }}</div>
+      </div>
+
+      <div class="top3-meta" style="margin-top:.8rem">
+        <div class="top3-meta-row"><span class="top3-meta-label">현재가</span><span class="top3-meta-value">{{ r.price_str }}</span></div>
+        <div class="top3-meta-row"><span class="top3-meta-label">등락률</span><span class="top3-meta-value {{ 'up' if r.change_pct >= 0 else 'down' }}">{{ '+' if r.change_pct >= 0 else '' }}{{ '%.2f'|format(r.change_pct) }}%</span></div>
+        <div class="top3-meta-row"><span class="top3-meta-label">스토리</span><span class="top3-meta-value" style="color:#ecd092;font-family:inherit;font-size:.8rem">{{ r.damodaran }}</span></div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="card" style="text-align:center;padding:3rem 1rem">
+    <div style="color:var(--gray);font-size:1.05rem;line-height:1.7">
+      오늘은 <span style="color:var(--gold2)">관심</span> 판정 조건을 충족하는 종목이 없습니다.<br>
+      (종합 점수 70점 이상 + 200일선 위 필요)
+    </div>
+  </div>
+  {% endif %}
+
+  <div style="padding:.9rem 1.1rem;background:var(--bg3);border-left:3px solid var(--gold);font-size:.88rem;color:var(--gray);line-height:1.75;border-radius:2px">
+    ※ 한국 종목은 무료 데이터 소스에서 펀더멘털(ROE·PER·PEG 등) 제공이 제한적이므로 <strong style="color:#ecd092">기술적 지표 위주</strong>로 평가합니다.<br>
+    ※ 펀더멘털 별도 검토 필요. <strong style="color:#ecd092">매수·매도 권유가 아닙니다.</strong>
+  </div>
+</div>
+
+<!-- TOP 10 -->
+<div class="page" id="page-top10">
+  <div class="sec-label">상위 후보</div>
+  <div class="sec-title">한국 <em>TOP 10</em> 후보 종목</div>
+  <div class="sec-sub">200일선 위 + 종합 점수 상위 10개. 매수 후보 풀로 검토하실 수 있습니다.</div>
+
+  <div class="card">
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>티커</th><th>이름</th><th>섹터</th>
+            <th style="text-align:right">가격</th><th style="text-align:right">등락</th>
+            <th>50일</th><th>200일</th><th>골든X</th>
+            <th style="text-align:right">3M</th><th style="text-align:right">6M</th>
+            <th style="text-align:right">변동성</th>
+            <th style="text-align:right">점수</th><th>스토리</th><th>판정</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in top10 %}
+          <tr>
+            <td style="color:#7a7972">{{ loop.index }}</td>
+            <td class="ticker">{{ r.ticker }}</td>
+            <td style="color:#b8b3a4;font-size:.84rem;max-width:160px;overflow:hidden;text-overflow:ellipsis">{{ r.name }}</td>
+            <td style="color:#7a7972;font-size:.78rem">{{ r.sector }}</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace">{{ r.price_str }}</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace" class="{{ 'up' if r.change_pct >= 0 else 'down' }}">
+              {{ '+' if r.change_pct >= 0 else '' }}{{ '%.2f'|format(r.change_pct) }}%
+            </td>
+            <td>{% if r.above_sma50 %}<span style="color:#4ade80">✓</span>{% else %}<span style="color:#f06b6a">✗</span>{% endif %}</td>
+            <td>{% if r.above_sma200 %}<span style="color:#4ade80">✓</span>{% else %}<span style="color:#f06b6a">✗</span>{% endif %}</td>
+            <td>{% if r.golden_cross %}<span style="color:#ecd092">⭐</span>{% else %}<span style="color:#5c5b54">·</span>{% endif %}</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace" class="{{ 'up' if r.return_3m >= 0 else 'down' }}">{{ '%.1f'|format(r.return_3m) }}%</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace" class="{{ 'up' if r.return_6m >= 0 else 'down' }}">{{ '%.1f'|format(r.return_6m) }}%</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">{{ '%.0f'|format(r.volatility_20d) }}%</td>
+            <td style="text-align:right" class="score-cell {{ 'score-hi' if r.combined_score >= 70 else 'score-md' if r.combined_score >= 50 else 'score-lo' }}">{{ '%.0f'|format(r.combined_score) }}</td>
+            <td style="font-size:.78rem;color:#ecd092">{{ r.damodaran }}</td>
+            <td>
+              {% if r.verdict == '관심' %}<span class="verdict v-watch">관심</span>
+              {% elif r.verdict == '보류' %}<span class="verdict v-hold">보류</span>
+              {% else %}<span class="verdict v-fail">미충족</span>{% endif %}
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="15" style="text-align:center;color:#7a7972;padding:1.5rem">데이터 없음</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- 하이라이트 30 -->
+<div class="page" id="page-highlights">
+  <div class="sec-label">시장 스크리닝</div>
+  <div class="sec-title">하이라이트 <em>TOP 30</em></div>
+  <div class="sec-sub">각 카테고리별 상위 30개.</div>
+
+  <div class="highlight-grid">
+    <div class="highlight-card">
+      <div class="highlight-head"><div class="highlight-title">📈 상승률 TOP 30</div></div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>티커</th><th>이름</th><th style="text-align:right">등락</th><th style="text-align:right">점수</th></tr></thead>
+        <tbody>
+          {% for r in highlights.top_gainers %}
+          <tr><td class="ticker">{{ r.ticker }}</td><td style="color:#b8b3a4;font-size:.82rem">{{ r.name }}</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace" class="{{ 'up' if r.change_pct >= 0 else 'down' }}">{{ '+' if r.change_pct >= 0 else '' }}{{ '%.2f'|format(r.change_pct) }}%</td>
+            <td style="text-align:right" class="score-cell {{ 'score-hi' if r.combined_score >= 70 else 'score-md' if r.combined_score >= 50 else 'score-lo' }}">{{ '%.0f'|format(r.combined_score) }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table></div>
+    </div>
+
+    <div class="highlight-card">
+      <div class="highlight-head"><div class="highlight-title">🔊 거래량 급증 TOP 30</div></div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>티커</th><th>이름</th><th style="text-align:right">배수</th><th style="text-align:right">점수</th></tr></thead>
+        <tbody>
+          {% for r in highlights.volume_surge %}
+          <tr><td class="ticker">{{ r.ticker }}</td><td style="color:#b8b3a4;font-size:.82rem">{{ r.name }}</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace;color:#ecd092;font-weight:600">{{ '%.1f'|format(r.volume_ratio) }}x</td>
+            <td style="text-align:right" class="score-cell {{ 'score-hi' if r.combined_score >= 70 else 'score-md' if r.combined_score >= 50 else 'score-lo' }}">{{ '%.0f'|format(r.combined_score) }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table></div>
+    </div>
+
+    <div class="highlight-card">
+      <div class="highlight-head"><div class="highlight-title">⬆ 200일선 위 강세 TOP 30</div></div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>티커</th><th>이름</th><th>골든X</th><th style="text-align:right">점수</th></tr></thead>
+        <tbody>
+          {% for r in highlights.sma200_break %}
+          <tr><td class="ticker">{{ r.ticker }}</td><td style="color:#b8b3a4;font-size:.82rem">{{ r.name }}</td>
+            <td>{% if r.golden_cross %}<span style="color:#ecd092">⭐</span>{% else %}<span style="color:#5c5b54">·</span>{% endif %}</td>
+            <td style="text-align:right" class="score-cell {{ 'score-hi' if r.combined_score >= 70 else 'score-md' if r.combined_score >= 50 else 'score-lo' }}">{{ '%.0f'|format(r.combined_score) }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table></div>
+    </div>
+
+    <div class="highlight-card">
+      <div class="highlight-head"><div class="highlight-title">🎯 52주 신고가 근접 TOP 30</div></div>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>티커</th><th>이름</th><th style="text-align:right">고점 대비</th><th style="text-align:right">점수</th></tr></thead>
+        <tbody>
+          {% for r in highlights.near_52w_high %}
+          <tr><td class="ticker">{{ r.ticker }}</td><td style="color:#b8b3a4;font-size:.82rem">{{ r.name }}</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace">{{ '%.2f'|format(r.pct_from_52w_high) }}%</td>
+            <td style="text-align:right" class="score-cell {{ 'score-hi' if r.combined_score >= 70 else 'score-md' if r.combined_score >= 50 else 'score-lo' }}">{{ '%.0f'|format(r.combined_score) }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+</div>
+
+<!-- 전체 후보 + 펀더멘털 -->
+<div class="page" id="page-full">
+  <div class="sec-label">전체 종합</div>
+  <div class="sec-title">전체 <em>후보 리스트</em> (상위 50)</div>
+  <div class="sec-sub">KOSPI/KOSDAQ 시총 상위 종목 분석 결과 종합 점수 상위 50개. 한국 종목은 무료 데이터에서 펀더멘털이 제한적이라 기술적 지표 중심으로 분석합니다.</div>
+
+  <div class="card">
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>티커</th><th>이름</th><th>섹터</th>
+            <th style="text-align:right">가격</th><th style="text-align:right">등락</th>
+            <th>50일</th><th>200일</th><th>골든X</th>
+            <th style="text-align:right">거래량배수</th>
+            <th style="text-align:right">3M</th><th style="text-align:right">6M</th>
+            <th style="text-align:right">52w 고점</th>
+            <th style="text-align:right">변동성</th>
+            <th style="text-align:right">점수</th><th>스토리</th><th>판정</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in full %}
+          <tr>
+            <td style="color:#7a7972">{{ loop.index }}</td>
+            <td class="ticker">{{ r.ticker }}</td>
+            <td style="color:#b8b3a4;font-size:.82rem;max-width:140px;overflow:hidden;text-overflow:ellipsis">{{ r.name }}</td>
+            <td style="color:#7a7972;font-size:.74rem">{{ r.sector }}</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace">{{ r.price_str }}</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace" class="{{ 'up' if r.change_pct >= 0 else 'down' }}">{{ '+' if r.change_pct >= 0 else '' }}{{ '%.2f'|format(r.change_pct) }}%</td>
+            <td>{% if r.above_sma50 %}<span style="color:#4ade80">✓</span>{% else %}<span style="color:#f06b6a">✗</span>{% endif %}</td>
+            <td>{% if r.above_sma200 %}<span style="color:#4ade80">✓</span>{% else %}<span style="color:#f06b6a">✗</span>{% endif %}</td>
+            <td>{% if r.golden_cross %}<span style="color:#ecd092">⭐</span>{% else %}<span style="color:#5c5b54">·</span>{% endif %}</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace">{{ '%.1f'|format(r.volume_ratio) }}x</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace" class="{{ 'up' if r.return_3m >= 0 else 'down' }}">{{ '%.1f'|format(r.return_3m) }}%</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace" class="{{ 'up' if r.return_6m >= 0 else 'down' }}">{{ '%.1f'|format(r.return_6m) }}%</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">{{ '%.1f'|format(r.pct_from_52w_high) }}%</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">{{ '%.0f'|format(r.volatility_20d) }}%</td>
+            <td style="text-align:right" class="score-cell {{ 'score-hi' if r.combined_score >= 70 else 'score-md' if r.combined_score >= 50 else 'score-lo' }}">{{ '%.0f'|format(r.combined_score) }}</td>
+            <td style="font-size:.74rem;color:#ecd092">{{ r.damodaran }}</td>
+            <td>
+              {% if r.verdict == '관심' %}<span class="verdict v-watch">관심</span>
+              {% elif r.verdict == '보류' %}<span class="verdict v-hold">보류</span>
+              {% else %}<span class="verdict v-fail">미충족</span>{% endif %}
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="17" style="text-align:center;color:#7a7972;padding:1.5rem">데이터 없음</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div style="padding:.9rem 1.1rem;background:var(--bg3);border-left:3px solid var(--gold);font-size:.88rem;color:var(--gray);line-height:1.75;border-radius:2px">
+    ※ <strong style="color:#ecd092">점수 산정</strong>: 기술적 지표(추세·모멘텀·거래량·52주위치) 가중치 합산. 한국은 펀더멘털 데이터 제한으로 기술적 점수가 종합 점수와 동일합니다.<br>
+    ※ <strong style="color:#ecd092">판정</strong>: 관심(70+ &amp; 200일선 위) / 보류(55+) / 미충족(55 미만)<br>
+    ※ 펀더멘털(ROE·PER·PEG 등)은 별도 검토하시기 바랍니다.
+  </div>
+</div>
+
+<!-- 리스크 지표 -->
+<div class="page" id="page-risk">
+  <div class="sec-label">리스크 분석</div>
+  <div class="sec-title">종목별 <em>리스크 지표</em></div>
+  <div class="sec-sub">상위 50개 종목의 1년 기준 MDD · 샤프 · 베타 · 알파 · VaR. 낮은 리스크 점수일수록 안전.</div>
+
+  <div class="card">
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>티커</th><th>이름</th>
+            <th style="text-align:right">1년 수익</th>
+            <th style="text-align:right">MDD</th>
+            <th style="text-align:right">변동성</th>
+            <th style="text-align:right">샤프</th>
+            <th style="text-align:right">베타</th>
+            <th style="text-align:right">알파</th>
+            <th style="text-align:right">VaR95</th>
+            <th style="text-align:right">리스크점수</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in full %}
+          <tr>
+            <td style="color:#7a7972">{{ loop.index }}</td>
+            <td class="ticker">{{ r.ticker }}</td>
+            <td style="color:#b8b3a4;font-size:.84rem;max-width:160px;overflow:hidden;text-overflow:ellipsis">{{ r.name }}</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace" class="{{ 'up' if r.return_6m >= 0 else 'down' }}">{{ '%+.1f'|format(r.return_6m) }}%</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace;color:#f06b6a">{{ r.mdd_str }}</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace">{{ '%.1f%%'|format(r.volatility_20d) }}</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace" class="{{ 'up' if (r.sharpe or 0) > 1 else '' }}">{{ r.sharpe_str }}</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace">{{ r.beta_str }}</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace" class="{{ 'up' if (r.alpha or 0) >= 0 else 'down' }}">{{ r.alpha_str }}</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace;color:#f06b6a">{{ r.var_95_str }}</td>
+            <td style="text-align:right" class="score-cell {{ 'score-hi' if (r.risk_score or 100) <= 30 else 'score-md' if (r.risk_score or 100) <= 60 else 'score-lo' }}">{{ r.risk_score_str }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="11" style="text-align:center;color:#7a7972;padding:1.5rem">데이터 없음</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div style="padding:.9rem 1.1rem;background:var(--bg3);border-left:3px solid var(--gold);font-size:.88rem;color:var(--gray);line-height:1.75;border-radius:2px">
+    ※ <strong style="color:#ecd092">MDD</strong>: 1년 최대 낙폭. <strong style="color:#ecd092">샤프</strong>: 변동성 대비 초과수익 (1↑ 양호).<br>
+    ※ <strong style="color:#ecd092">베타</strong>: S&P 500 대비 민감도. <strong style="color:#ecd092">알파</strong>: S&P 500 대비 초과수익.<br>
+    ※ <strong style="color:#ecd092">VaR 95%</strong>: 평상시 95% 신뢰구간 일간 손실. <strong style="color:#ecd092">리스크 점수</strong>: 0(안전) ~ 100(고위험).
+  </div>
+</div>
+
+<!-- 자산 배분 -->
+<div class="page" id="page-allocation">
+  <div class="sec-label">오늘의 의견</div>
+  <div class="sec-title">자산 <em>배분</em></div>
+  <div class="sec-sub">VIX 변동성 지표 기반 일반적 참고치.</div>
+
+  <div class="card">
+    <div class="alloc-row">
+      <div class="alloc-seg alloc-stock" style="width:{{ allocation.stock }}%">주식 {{ allocation.stock }}%</div>
+      <div class="alloc-seg alloc-gold" style="width:{{ allocation.gold }}%">금 {{ allocation.gold }}%</div>
+      <div class="alloc-seg alloc-cash" style="width:{{ allocation.cash }}%">현금/채권 {{ allocation.cash }}%</div>
+    </div>
+    <div class="mkt-interpret">{{ allocation.note }}</div>
+  </div>
+</div>
+
+<!-- 카카오톡 -->
+<div class="page" id="page-kakao">
+  <div class="sec-label">발송용</div>
+  <div class="sec-title">카카오톡 <em>요약</em></div>
+  <div class="sec-sub">500자 내외 요약. 복사해서 카카오톡 채널/그룹에 발송하세요.</div>
+  <div class="text-box" id="kakao-text">{{ kakao }}</div>
+  <button class="copy-btn" onclick="copyText('kakao-text')">📋 복사하기</button>
+</div>
+
+<!-- 블로그 -->
+<div class="page" id="page-blog">
+  <div class="sec-label">발송용</div>
+  <div class="sec-title">블로그 <em>업로드용</em></div>
+  <div class="sec-sub">마크다운 포맷. 블로그(티스토리/브런치/노션 등)에 그대로 붙여넣을 수 있습니다.</div>
+  <div class="text-box" id="blog-text">{{ blog }}</div>
+  <button class="copy-btn" onclick="copyText('blog-text')">📋 복사하기</button>
+</div>
+
+<div class="disc">
+  본 리포트는 공개 시장 데이터(Yahoo Finance) 기반 투자 참고용 정보입니다.<br>
+  특정 종목의 매수·매도를 권유하지 않으며, 투자 판단과 손익 책임은 전적으로 투자자 본인에게 있습니다.
+</div>
+
+<script>
+function tab(name, el){
+  document.querySelectorAll('.tabs > .tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('page-'+name).classList.add('active');
+}
+function copyText(id){
+  const el = document.getElementById(id);
+  navigator.clipboard.writeText(el.textContent).then(()=>alert('복사 완료!'));
+}
+</script>
+</body>
+</html>
