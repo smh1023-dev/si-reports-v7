@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>에스아이스토리 US 프리미엄 — 2026년 05월 27일</title>
+<title>에스아이스토리 US 프리미엄 — {{ date_str }}</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
@@ -174,27 +174,13 @@ td{padding:.72rem .5rem;border-bottom:1px solid rgba(212,178,94,.08);color:var(-
 
 @media(max-width:900px){.top3-grid{grid-template-columns:1fr}.highlight-grid{grid-template-columns:1fr}}
 @media(max-width:700px){.page{padding:1.2rem}.sec-title{font-size:1.6rem}nav{padding:.8rem 1rem}.tabs{padding:0 1rem}}
-/* 아코디언 (TOP 10 펼침) */
-.top10-accordion-table tbody tr.top10-row{transition:background .15s ease}
-.top10-accordion-table tbody tr.top10-row:hover{background:rgba(212,178,94,0.05)}
-.top10-accordion-table tbody tr.top10-row.open{background:rgba(212,178,94,0.1)}
-.acc-chevron{display:inline-block;color:var(--gold2);font-size:.75rem;transition:transform .25s ease;width:14px;text-align:center}
-.top10-row.open .acc-chevron{transform:rotate(90deg)}
-.acc-content{padding:1.2rem 1.5rem;border-top:2px solid var(--gold);background:linear-gradient(180deg,#0e0d0a 0%,#100f0b 100%)}
-.acc-section{margin-bottom:1.2rem}
-.acc-section:last-child{margin-bottom:0}
-.acc-section-title{font-size:.78rem;color:var(--gold2);font-weight:600;margin-bottom:.6rem;letter-spacing:.06em}
-
-@media(max-width:900px){
-  .acc-content{padding:1rem .8rem}
-}
 </style>
 </head>
 <body>
 
 <nav>
   <div class="logo">에스아이<span> 스토리</span><span class="flag-badge">🇺🇸 US</span><span class="premium-badge">PREMIUM</span></div>
-  <div class="report-date">2026년 05월 27일 20:30 기준 · 투자 참고용<span class="badge">매일 아침 갱신</span><a href="./portfolio.html" style="display:inline-block;margin-left:.8rem;padding:4px 12px;border:1px solid var(--gold);border-radius:3px;color:var(--gold2);font-weight:600;font-size:.82rem;text-decoration:none;vertical-align:middle">📊 내 포트폴리오</a></div>
+  <div class="report-date">{{ timestamp_str }}<span class="badge">매일 아침 갱신</span><a href="./portfolio.html" style="display:inline-block;margin-left:.8rem;padding:4px 12px;border:1px solid var(--gold);border-radius:3px;color:var(--gold2);font-weight:600;font-size:.82rem;text-decoration:none;vertical-align:middle">📊 내 포트폴리오</a></div>
 </nav>
 
 <div class="tabs">
@@ -216,176 +202,32 @@ td{padding:.72rem .5rem;border-bottom:1px solid rgba(212,178,94,.08);color:var(-
   <div class="sec-title">🇺🇸 미국 시황 <em>스냅샷</em></div>
   <div class="sec-sub">미국·한국 주요 지수와 환율 어제 종가 기준 등락. 데이터 출처: Yahoo Finance</div>
 
-  
-    
+  {% for grp_key, grp_title in [('us_index','🇺🇸 미국 지수'),('kr_index','🇰🇷 한국 지수'),('etf','📊 주요 ETF'),('macro','🌐 매크로 · 환율')] %}
+    {% if market[grp_key] %}
     <div class="card">
-      <div class="card-title">🇺🇸 미국 지수</div>
+      <div class="card-title">{{ grp_title }}</div>
       <div class="mkt-grid">
-        
+        {% for m in market[grp_key] %}
         <div class="mkt-card">
-          <div class="mkt-name">S&amp;P 500</div>
-          <div class="mkt-sub">^GSPC</div>
-          <div class="mkt-val">216.82</div>
-          <div class="mkt-chg down">
-            -0.17%
+          <div class="mkt-name">{{ m.label }}</div>
+          <div class="mkt-sub">{{ m.ticker }}</div>
+          <div class="mkt-val">{{ m.value_str }}</div>
+          <div class="mkt-chg {{ 'up' if m.change_pct >= 0 else 'down' }}">
+            {{ '+' if m.change_pct >= 0 else '' }}{{ '%.2f'|format(m.change_pct) }}%
           </div>
         </div>
-        
-        <div class="mkt-card">
-          <div class="mkt-name">나스닥</div>
-          <div class="mkt-sub">^IXIC</div>
-          <div class="mkt-val">526.06</div>
-          <div class="mkt-chg up">
-            +0.02%
-          </div>
-        </div>
-        
-        <div class="mkt-card">
-          <div class="mkt-name">다우존스</div>
-          <div class="mkt-sub">^DJI</div>
-          <div class="mkt-val">196.59</div>
-          <div class="mkt-chg up">
-            +0.37%
-          </div>
-        </div>
-        
-        <div class="mkt-card">
-          <div class="mkt-name">러셀 2000</div>
-          <div class="mkt-sub">^RUT</div>
-          <div class="mkt-val">195.94</div>
-          <div class="mkt-chg down">
-            -1.54%
-          </div>
-        </div>
-        
+        {% endfor %}
       </div>
     </div>
-    
-  
-    
-    <div class="card">
-      <div class="card-title">🇰🇷 한국 지수</div>
-      <div class="mkt-grid">
-        
-        <div class="mkt-card">
-          <div class="mkt-name">코스피</div>
-          <div class="mkt-sub">^KS11</div>
-          <div class="mkt-val">203.34</div>
-          <div class="mkt-chg up">
-            +1.79%
-          </div>
-        </div>
-        
-        <div class="mkt-card">
-          <div class="mkt-name">코스닥</div>
-          <div class="mkt-sub">^KQ11</div>
-          <div class="mkt-val">421.40</div>
-          <div class="mkt-chg up">
-            +0.26%
-          </div>
-        </div>
-        
-      </div>
-    </div>
-    
-  
-    
-    <div class="card">
-      <div class="card-title">📊 주요 ETF</div>
-      <div class="mkt-grid">
-        
-        <div class="mkt-card">
-          <div class="mkt-name">SPY</div>
-          <div class="mkt-sub">SPY</div>
-          <div class="mkt-val">266.64</div>
-          <div class="mkt-chg up">
-            +1.78%
-          </div>
-        </div>
-        
-        <div class="mkt-card">
-          <div class="mkt-name">QQQ</div>
-          <div class="mkt-sub">QQQ</div>
-          <div class="mkt-val">219.02</div>
-          <div class="mkt-chg down">
-            -1.66%
-          </div>
-        </div>
-        
-        <div class="mkt-card">
-          <div class="mkt-name">DIA</div>
-          <div class="mkt-sub">DIA</div>
-          <div class="mkt-val">438.20</div>
-          <div class="mkt-chg up">
-            +5.05%
-          </div>
-        </div>
-        
-        <div class="mkt-card">
-          <div class="mkt-name">IWM</div>
-          <div class="mkt-sub">IWM</div>
-          <div class="mkt-val">94.80</div>
-          <div class="mkt-chg down">
-            -0.12%
-          </div>
-        </div>
-        
-      </div>
-    </div>
-    
-  
-    
-    <div class="card">
-      <div class="card-title">🌐 매크로 · 환율</div>
-      <div class="mkt-grid">
-        
-        <div class="mkt-card">
-          <div class="mkt-name">VIX</div>
-          <div class="mkt-sub">^VIX</div>
-          <div class="mkt-val">519.36</div>
-          <div class="mkt-chg up">
-            +1.96%
-          </div>
-        </div>
-        
-        <div class="mkt-card">
-          <div class="mkt-name">TLT 장기채</div>
-          <div class="mkt-sub">TLT</div>
-          <div class="mkt-val">89.44</div>
-          <div class="mkt-chg down">
-            -1.13%
-          </div>
-        </div>
-        
-        <div class="mkt-card">
-          <div class="mkt-name">금(GLD)</div>
-          <div class="mkt-sub">GLD</div>
-          <div class="mkt-val">147.19</div>
-          <div class="mkt-chg up">
-            +2.73%
-          </div>
-        </div>
-        
-        <div class="mkt-card">
-          <div class="mkt-name">USD/KRW</div>
-          <div class="mkt-sub">KRW=X</div>
-          <div class="mkt-val">175.28</div>
-          <div class="mkt-chg down">
-            -1.14%
-          </div>
-        </div>
-        
-      </div>
-    </div>
-    
-  
+    {% endif %}
+  {% endfor %}
 
-  <div class="mkt-interpret">VIX 519.4 — 변동성 과열. 리스크 관리 우선. 코스피 +1.79% 상승.</div>
+  <div class="mkt-interpret">{{ market_interpret }}</div>
 
   <div class="stats">
-    <div class="stat"><div class="stat-label">분석 종목</div><div class="stat-value">20 / 20</div></div>
-    <div class="stat"><div class="stat-label">200일선 위</div><div class="stat-value">15</div></div>
-    <div class="stat"><div class="stat-label">펀더멘털 보유</div><div class="stat-value">20</div></div>
+    <div class="stat"><div class="stat-label">분석 종목</div><div class="stat-value">{{ stats.us_loaded }} / {{ stats.us_total }}</div></div>
+    <div class="stat"><div class="stat-label">200일선 위</div><div class="stat-value">{{ stats.us_above_200 }}</div></div>
+    <div class="stat"><div class="stat-label">펀더멘털 보유</div><div class="stat-value">{{ stats.us_fund_filled }}</div></div>
   </div>
 </div>
 
@@ -395,69 +237,69 @@ td{padding:.72rem .5rem;border-bottom:1px solid rgba(212,178,94,.08);color:var(-
   <div class="sec-title">미국 <em>TOP 3</em> 관심 종목</div>
   <div class="sec-sub">기술적 추세 + 펀더멘털 종합 점수 최상위 3개. 200일선 위 + "관심" 판정 조건 충족 종목만.</div>
 
-  
+  {% if top3 %}
   <div class="top3-grid">
-    
-    
+    {% for r in top3 %}
+    {% set st = stories.get(r.ticker, {}) %}
     <div class="top3-card">
-      <div class="top3-rank">1</div>
+      <div class="top3-rank">{{ loop.index }}</div>
       <div class="top3-label">Ticker</div>
-      <div class="top3-ticker">PG</div>
-      <div class="top3-name">Procter &amp; Gamble Co. · Consumer Staples</div>
+      <div class="top3-ticker">{{ r.ticker }}</div>
+      <div class="top3-name">{{ r.name }} · {{ r.sector }}</div>
 
       <div class="top3-label">종합 점수</div>
-      <div class="top3-score">68</div>
+      <div class="top3-score">{{ '%.0f'|format(r.combined_score) }}</div>
 
       <!-- 점수 분해 -->
       <div class="score-breakdown">
         <div style="font-size:.74rem;color:var(--gold2);margin-bottom:.6rem;letter-spacing:.06em">📊 점수 분해 (기술)</div>
         <div class="score-bar-row">
           <div class="score-bar-label">추세</div>
-          <div class="score-bar-track"><div class="score-bar-fill" style="width:100.0%"></div></div>
-          <div class="score-bar-val">32.0/32</div>
+          <div class="score-bar-track"><div class="score-bar-fill" style="width:{{ (r.score_trend/32*100)|round }}%"></div></div>
+          <div class="score-bar-val">{{ r.score_trend }}/32</div>
         </div>
         <div class="score-bar-row">
           <div class="score-bar-label">모멘텀</div>
-          <div class="score-bar-track"><div class="score-bar-fill" style="width:57.0%"></div></div>
-          <div class="score-bar-val">11.5/20</div>
+          <div class="score-bar-track"><div class="score-bar-fill" style="width:{{ (r.score_momentum/20*100)|round }}%"></div></div>
+          <div class="score-bar-val">{{ r.score_momentum }}/20</div>
         </div>
         <div class="score-bar-row">
           <div class="score-bar-label">거래량</div>
-          <div class="score-bar-track"><div class="score-bar-fill" style="width:0.0%"></div></div>
-          <div class="score-bar-val">0.0/15</div>
+          <div class="score-bar-track"><div class="score-bar-fill" style="width:{{ (r.score_volume/15*100)|round }}%"></div></div>
+          <div class="score-bar-val">{{ r.score_volume }}/15</div>
         </div>
         <div class="score-bar-row">
           <div class="score-bar-label">52주위치</div>
-          <div class="score-bar-track"><div class="score-bar-fill" style="width:100.0%"></div></div>
-          <div class="score-bar-val">15/15</div>
+          <div class="score-bar-track"><div class="score-bar-fill" style="width:{{ (r.score_position_52w/15*100)|round }}%"></div></div>
+          <div class="score-bar-val">{{ r.score_position_52w }}/15</div>
         </div>
       </div>
 
       <!-- 핵심 투자 논리 (Damodaran Thesis) -->
-      
+      {% if st.get('thesis') %}
       <div class="ai-summary">
         <div class="ai-summary-label">📖 Damodaran 투자 논리</div>
-        <div class="ai-summary-text">[Consumer Staples] 산업 평균 동인. 종목별 차별화 요인 검토 후 진입 판단 필요.</div>
+        <div class="ai-summary-text">{{ st.get('thesis') }}</div>
       </div>
-      
+      {% endif %}
 
       <!-- 4개 정성 분석 -->
       <div class="story-grid">
         <div class="story-cell">
           <div class="story-icon">🛡️ 해자 (Moat)</div>
-          <div class="story-text">[일반 해자 패턴] 강력한 브랜드 · 유통 채널 장악 · 규모의 경제</div>
+          <div class="story-text">{{ st.get('moat', '데이터 부족') }}</div>
         </div>
         <div class="story-cell">
           <div class="story-icon">📈 성장 동인</div>
-          <div class="story-text">[Consumer Staples] 필수재 가격 결정력 · 신흥국 소비 확대 · 프리미엄 카테고리</div>
+          <div class="story-text">{{ st.get('growth', '데이터 부족') }}</div>
         </div>
         <div class="story-cell">
           <div class="story-icon">⚠️ 리스크 요인</div>
-          <div class="story-text">[Consumer Staples] 산업 사이클, 경쟁 강도, 규제 환경 변화에 따른 변동성</div>
+          <div class="story-text">{{ st.get('risk', '검토 필요') }}</div>
         </div>
         <div class="story-cell">
           <div class="story-icon">🚀 메가트렌드</div>
-          <div class="story-text">산업별 메가트렌드 관련성은 별도 검토 필요</div>
+          <div class="story-text">{{ st.get('megatrend', '검토 필요') }}</div>
         </div>
       </div>
 
@@ -466,237 +308,46 @@ td{padding:.72rem .5rem;border-bottom:1px solid rgba(212,178,94,.08);color:var(-
         <div class="story-cell">
           <div class="story-icon">📊 위험 변화 (정량)</div>
           <div class="story-text">
-            
-            <strong class="check-pass">위험 감소 신호</strong><br>
-            <span class="dim">부채 낮음(D/E&lt;50) · 매출 +20% · EPS +25%</span>
+            {% set rc = st.get('risk_change', {}) %}
+            <strong class="{{ 'check-pass' if rc.get('score',0) >= 2 else 'check-warn' if rc.get('score',0) == 1 else 'check-fail' }}">{{ rc.get('verdict', '—') }}</strong><br>
+            <span class="dim">{{ rc.get('signals', '') }}</span>
           </div>
         </div>
         <div class="story-cell">
           <div class="story-icon">💰 밸류에이션 (정량)</div>
           <div class="story-text">
-            
-            <strong class="check-pass">저평가 구간</strong><br>
-            <span class="dim">PEG 1.20 ✓ · P/FCF 20 ✓ · PER 25</span>
+            {% set vl = st.get('valuation', {}) %}
+            <strong class="{{ 'check-pass' if vl.get('pass_ratio',0) >= 0.7 else 'check-warn' if vl.get('pass_ratio',0) >= 0.4 else 'check-fail' }}">{{ vl.get('verdict', '—') }}</strong><br>
+            <span class="dim">{{ vl.get('checks', '') }}</span>
           </div>
         </div>
       </div>
 
       <!-- 리스크 지표 -->
       <div class="risk-pills">
-        <div class="risk-pill"><span class="lbl">MDD</span>-21.9%</div>
-        <div class="risk-pill"><span class="lbl">샤프</span>1.37</div>
-        <div class="risk-pill"><span class="lbl">베타</span>—</div>
-        <div class="risk-pill"><span class="lbl">알파</span>—</div>
-        <div class="risk-pill"><span class="lbl">VaR95</span>-2.7%</div>
+        <div class="risk-pill"><span class="lbl">MDD</span>{{ r.mdd_str }}</div>
+        <div class="risk-pill"><span class="lbl">샤프</span>{{ r.sharpe_str }}</div>
+        <div class="risk-pill"><span class="lbl">베타</span>{{ r.beta_str }}</div>
+        <div class="risk-pill"><span class="lbl">알파</span>{{ r.alpha_str }}</div>
+        <div class="risk-pill"><span class="lbl">VaR95</span>{{ r.var_95_str }}</div>
       </div>
 
       <div class="top3-meta" style="margin-top:.8rem">
-        <div class="top3-meta-row"><span class="top3-meta-label">현재가</span><span class="top3-meta-value">$588.12</span></div>
-        <div class="top3-meta-row"><span class="top3-meta-label">등락률</span><span class="top3-meta-value up">+0.77%</span></div>
-        <div class="top3-meta-row"><span class="top3-meta-label">스토리</span><span class="top3-meta-value" style="color:#ecd092;font-family:inherit;font-size:.8rem">성장기 (Expansion)</span></div>
+        <div class="top3-meta-row"><span class="top3-meta-label">현재가</span><span class="top3-meta-value">{{ r.price_str }}</span></div>
+        <div class="top3-meta-row"><span class="top3-meta-label">등락률</span><span class="top3-meta-value {{ 'up' if r.change_pct >= 0 else 'down' }}">{{ '+' if r.change_pct >= 0 else '' }}{{ '%.2f'|format(r.change_pct) }}%</span></div>
+        <div class="top3-meta-row"><span class="top3-meta-label">스토리</span><span class="top3-meta-value" style="color:#ecd092;font-family:inherit;font-size:.8rem">{{ r.damodaran }}</span></div>
       </div>
     </div>
-    
-    
-    <div class="top3-card">
-      <div class="top3-rank">2</div>
-      <div class="top3-label">Ticker</div>
-      <div class="top3-ticker">XOM</div>
-      <div class="top3-name">Exxon Mobil Corp. · Energy</div>
-
-      <div class="top3-label">종합 점수</div>
-      <div class="top3-score">66</div>
-
-      <!-- 점수 분해 -->
-      <div class="score-breakdown">
-        <div style="font-size:.74rem;color:var(--gold2);margin-bottom:.6rem;letter-spacing:.06em">📊 점수 분해 (기술)</div>
-        <div class="score-bar-row">
-          <div class="score-bar-label">추세</div>
-          <div class="score-bar-track"><div class="score-bar-fill" style="width:100.0%"></div></div>
-          <div class="score-bar-val">32.0/32</div>
-        </div>
-        <div class="score-bar-row">
-          <div class="score-bar-label">모멘텀</div>
-          <div class="score-bar-track"><div class="score-bar-fill" style="width:43.0%"></div></div>
-          <div class="score-bar-val">8.7/20</div>
-        </div>
-        <div class="score-bar-row">
-          <div class="score-bar-label">거래량</div>
-          <div class="score-bar-track"><div class="score-bar-fill" style="width:0.0%"></div></div>
-          <div class="score-bar-val">0.0/15</div>
-        </div>
-        <div class="score-bar-row">
-          <div class="score-bar-label">52주위치</div>
-          <div class="score-bar-track"><div class="score-bar-fill" style="width:100.0%"></div></div>
-          <div class="score-bar-val">15/15</div>
-        </div>
-      </div>
-
-      <!-- 핵심 투자 논리 (Damodaran Thesis) -->
-      
-      <div class="ai-summary">
-        <div class="ai-summary-label">📖 Damodaran 투자 논리</div>
-        <div class="ai-summary-text">[Energy] 산업 평균 동인. 종목별 차별화 요인 검토 후 진입 판단 필요.</div>
-      </div>
-      
-
-      <!-- 4개 정성 분석 -->
-      <div class="story-grid">
-        <div class="story-cell">
-          <div class="story-icon">🛡️ 해자 (Moat)</div>
-          <div class="story-text">[일반 해자 패턴] 매장량 · 인프라(파이프라인/터미널) · 통합 밸류체인</div>
-        </div>
-        <div class="story-cell">
-          <div class="story-icon">📈 성장 동인</div>
-          <div class="story-text">[Energy] 유가 사이클 · 에너지 안보 · LNG 수출 · 재생에너지 전환</div>
-        </div>
-        <div class="story-cell">
-          <div class="story-icon">⚠️ 리스크 요인</div>
-          <div class="story-text">[Energy] 산업 사이클, 경쟁 강도, 규제 환경 변화에 따른 변동성</div>
-        </div>
-        <div class="story-cell">
-          <div class="story-icon">🚀 메가트렌드</div>
-          <div class="story-text">산업별 메가트렌드 관련성은 별도 검토 필요</div>
-        </div>
-      </div>
-
-      <!-- 정량 체크 (위험 변화 + 밸류에이션) -->
-      <div class="story-grid">
-        <div class="story-cell">
-          <div class="story-icon">📊 위험 변화 (정량)</div>
-          <div class="story-text">
-            
-            <strong class="check-pass">위험 감소 신호</strong><br>
-            <span class="dim">부채 낮음(D/E&lt;50) · 매출 +20% · EPS +25%</span>
-          </div>
-        </div>
-        <div class="story-cell">
-          <div class="story-icon">💰 밸류에이션 (정량)</div>
-          <div class="story-text">
-            
-            <strong class="check-pass">저평가 구간</strong><br>
-            <span class="dim">PEG 1.20 ✓ · P/FCF 20 ✓ · PER 25</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- 리스크 지표 -->
-      <div class="risk-pills">
-        <div class="risk-pill"><span class="lbl">MDD</span>-17.5%</div>
-        <div class="risk-pill"><span class="lbl">샤프</span>0.66</div>
-        <div class="risk-pill"><span class="lbl">베타</span>—</div>
-        <div class="risk-pill"><span class="lbl">알파</span>—</div>
-        <div class="risk-pill"><span class="lbl">VaR95</span>-3.2%</div>
-      </div>
-
-      <div class="top3-meta" style="margin-top:.8rem">
-        <div class="top3-meta-row"><span class="top3-meta-label">현재가</span><span class="top3-meta-value">$312.36</span></div>
-        <div class="top3-meta-row"><span class="top3-meta-label">등락률</span><span class="top3-meta-value up">+2.38%</span></div>
-        <div class="top3-meta-row"><span class="top3-meta-label">스토리</span><span class="top3-meta-value" style="color:#ecd092;font-family:inherit;font-size:.8rem">성장기 (Expansion)</span></div>
-      </div>
-    </div>
-    
-    
-    <div class="top3-card">
-      <div class="top3-rank">3</div>
-      <div class="top3-label">Ticker</div>
-      <div class="top3-ticker">MA</div>
-      <div class="top3-name">Mastercard Inc. · Financials</div>
-
-      <div class="top3-label">종합 점수</div>
-      <div class="top3-score">65</div>
-
-      <!-- 점수 분해 -->
-      <div class="score-breakdown">
-        <div style="font-size:.74rem;color:var(--gold2);margin-bottom:.6rem;letter-spacing:.06em">📊 점수 분해 (기술)</div>
-        <div class="score-bar-row">
-          <div class="score-bar-label">추세</div>
-          <div class="score-bar-track"><div class="score-bar-fill" style="width:100.0%"></div></div>
-          <div class="score-bar-val">32.0/32</div>
-        </div>
-        <div class="score-bar-row">
-          <div class="score-bar-label">모멘텀</div>
-          <div class="score-bar-track"><div class="score-bar-fill" style="width:28.0%"></div></div>
-          <div class="score-bar-val">5.6/20</div>
-        </div>
-        <div class="score-bar-row">
-          <div class="score-bar-label">거래량</div>
-          <div class="score-bar-track"><div class="score-bar-fill" style="width:0.0%"></div></div>
-          <div class="score-bar-val">0.0/15</div>
-        </div>
-        <div class="score-bar-row">
-          <div class="score-bar-label">52주위치</div>
-          <div class="score-bar-track"><div class="score-bar-fill" style="width:100.0%"></div></div>
-          <div class="score-bar-val">15/15</div>
-        </div>
-      </div>
-
-      <!-- 핵심 투자 논리 (Damodaran Thesis) -->
-      
-      <div class="ai-summary">
-        <div class="ai-summary-label">📖 Damodaran 투자 논리</div>
-        <div class="ai-summary-text">[Financials] 산업 평균 동인. 종목별 차별화 요인 검토 후 진입 판단 필요.</div>
-      </div>
-      
-
-      <!-- 4개 정성 분석 -->
-      <div class="story-grid">
-        <div class="story-cell">
-          <div class="story-icon">🛡️ 해자 (Moat)</div>
-          <div class="story-text">[일반 해자 패턴] 자본 규모 · 라이선스 진입장벽 · 고객 신뢰</div>
-        </div>
-        <div class="story-cell">
-          <div class="story-icon">📈 성장 동인</div>
-          <div class="story-text">[Financials] 금리 환경 · 자본시장 활성화 · 핀테크 전환 · 자산운용 규모</div>
-        </div>
-        <div class="story-cell">
-          <div class="story-icon">⚠️ 리스크 요인</div>
-          <div class="story-text">[Financials] 산업 사이클, 경쟁 강도, 규제 환경 변화에 따른 변동성</div>
-        </div>
-        <div class="story-cell">
-          <div class="story-icon">🚀 메가트렌드</div>
-          <div class="story-text">산업별 메가트렌드 관련성은 별도 검토 필요</div>
-        </div>
-      </div>
-
-      <!-- 정량 체크 (위험 변화 + 밸류에이션) -->
-      <div class="story-grid">
-        <div class="story-cell">
-          <div class="story-icon">📊 위험 변화 (정량)</div>
-          <div class="story-text">
-            
-            <strong class="check-pass">위험 감소 신호</strong><br>
-            <span class="dim">부채 낮음(D/E&lt;50) · 매출 +20% · EPS +25%</span>
-          </div>
-        </div>
-        <div class="story-cell">
-          <div class="story-icon">💰 밸류에이션 (정량)</div>
-          <div class="story-text">
-            
-            <strong class="check-pass">저평가 구간</strong><br>
-            <span class="dim">PEG 1.20 ✓ · P/FCF 20 ✓ · PER 25</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- 리스크 지표 -->
-      <div class="risk-pills">
-        <div class="risk-pill"><span class="lbl">MDD</span>-13.8%</div>
-        <div class="risk-pill"><span class="lbl">샤프</span>3.08</div>
-        <div class="risk-pill"><span class="lbl">베타</span>—</div>
-        <div class="risk-pill"><span class="lbl">알파</span>—</div>
-        <div class="risk-pill"><span class="lbl">VaR95</span>-2.7%</div>
-      </div>
-
-      <div class="top3-meta" style="margin-top:.8rem">
-        <div class="top3-meta-row"><span class="top3-meta-label">현재가</span><span class="top3-meta-value">$523.57</span></div>
-        <div class="top3-meta-row"><span class="top3-meta-label">등락률</span><span class="top3-meta-value up">+1.68%</span></div>
-        <div class="top3-meta-row"><span class="top3-meta-label">스토리</span><span class="top3-meta-value" style="color:#ecd092;font-family:inherit;font-size:.8rem">성장기 (Expansion)</span></div>
-      </div>
-    </div>
-    
+    {% endfor %}
   </div>
-  
+  {% else %}
+  <div class="card" style="text-align:center;padding:3rem 1rem">
+    <div style="color:var(--gray);font-size:1.05rem;line-height:1.7">
+      오늘은 <span style="color:var(--gold2)">관심</span> 판정 조건을 충족하는 종목이 없습니다.<br>
+      (종합 점수 70점 이상 + 200일선 위 + 펀더멘털 양호 필요)
+    </div>
+  </div>
+  {% endif %}
 
   <div style="padding:.9rem 1.1rem;background:var(--bg3);border-left:3px solid var(--gold);font-size:.88rem;color:var(--gray);line-height:1.75;border-radius:2px">
     ※ ① ② 항목은 Claude API로 매일 생성한 분석입니다 (3일 캐시). API 키 없으면 산업 평균 문구로 대체.<br>
@@ -708,1240 +359,50 @@ td{padding:.72rem .5rem;border-bottom:1px solid rgba(212,178,94,.08);color:var(-
 <div class="page" id="page-top10">
   <div class="sec-label">상위 후보</div>
   <div class="sec-title">미국 <em>TOP 10</em> 후보 종목</div>
-  <div class="sec-sub">200일선 위 + 종합 점수 상위 10개. <strong style="color:#ecd092">각 종목 행을 클릭하면 Damodaran 5파트 분석이 펼쳐집니다.</strong></div>
+  <div class="sec-sub">200일선 위 + 종합 점수 상위 10개. 매수 후보 풀로 검토하실 수 있습니다.</div>
 
   <div class="card">
     <div class="tbl-wrap">
-      <table class="top10-accordion-table">
+      <table>
         <thead>
           <tr>
-            <th style="width:24px"></th>
             <th>#</th><th>티커</th><th>이름</th><th>섹터</th>
             <th style="text-align:right">가격</th><th style="text-align:right">등락</th>
-            <th>200일</th>
-            <th style="text-align:right">종합</th>
-            <th>판정</th>
+            <th>50일</th><th>200일</th><th>골든X</th>
+            <th style="text-align:right">기술</th><th style="text-align:right">펀더</th>
+            <th style="text-align:right">종합</th><th>스토리</th><th>판정</th>
           </tr>
         </thead>
         <tbody>
-          
-          
-          <tr class="top10-row" onclick="toggleAccordion(this)" style="cursor:pointer">
-            <td><span class="acc-chevron">▶</span></td>
-            <td style="color:#7a7972">1</td>
-            <td class="ticker">PG</td>
-            <td style="color:#b8b3a4;font-size:.84rem;max-width:160px;overflow:hidden;text-overflow:ellipsis">Procter &amp; Gamble Co.</td>
-            <td style="color:#7a7972;font-size:.78rem">Consumer Staples</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">$588.12</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">
-              +0.77%
+          {% for r in top10 %}
+          <tr>
+            <td style="color:#7a7972">{{ loop.index }}</td>
+            <td class="ticker">{{ r.ticker }}</td>
+            <td style="color:#b8b3a4;font-size:.84rem;max-width:160px;overflow:hidden;text-overflow:ellipsis">{{ r.name }}</td>
+            <td style="color:#7a7972;font-size:.78rem">{{ r.sector }}</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace">{{ r.price_str }}</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace" class="{{ 'up' if r.change_pct >= 0 else 'down' }}">
+              {{ '+' if r.change_pct >= 0 else '' }}{{ '%.2f'|format(r.change_pct) }}%
             </td>
-            <td><span style="color:#4ade80">✓</span></td>
-            <td style="text-align:right" class="score-cell score-md">68</td>
+            <td>{% if r.above_sma50 %}<span style="color:#4ade80">✓</span>{% else %}<span style="color:#f06b6a">✗</span>{% endif %}</td>
+            <td>{% if r.above_sma200 %}<span style="color:#4ade80">✓</span>{% else %}<span style="color:#f06b6a">✗</span>{% endif %}</td>
+            <td>{% if r.golden_cross %}<span style="color:#ecd092">⭐</span>{% else %}<span style="color:#5c5b54">·</span>{% endif %}</td>
+            <td style="text-align:right" class="score-cell {{ 'score-hi' if r.tech_score >= 70 else 'score-md' if r.tech_score >= 50 else 'score-lo' }}">{{ '%.0f'|format(r.tech_score) }}</td>
+            <td style="text-align:right" class="score-cell">{% if r.fund_score is not none %}{{ '%.0f'|format(r.fund_score) }}{% else %}—{% endif %}</td>
+            <td style="text-align:right" class="score-cell {{ 'score-hi' if r.combined_score >= 70 else 'score-md' if r.combined_score >= 50 else 'score-lo' }}">{{ '%.0f'|format(r.combined_score) }}</td>
+            <td style="font-size:.78rem;color:#ecd092">{{ r.damodaran }}</td>
             <td>
-              <span class="verdict v-watch">관심</span>
-              
+              {% if r.verdict == '관심' %}<span class="verdict v-watch">관심</span>
+              {% elif r.verdict == '보류' %}<span class="verdict v-hold">보류</span>
+              {% else %}<span class="verdict v-fail">미충족</span>{% endif %}
             </td>
           </tr>
-          <tr class="top10-detail" style="display:none">
-            <td colspan="10" style="padding:0;background:#0e0d0a">
-              <div class="acc-content">
-
-                <!-- 점수 분해 -->
-                <div class="acc-section">
-                  <div class="acc-section-title">📊 점수 분해</div>
-                  <div class="score-breakdown" style="margin:0">
-                    <div class="score-bar-row">
-                      <div class="score-bar-label">추세</div>
-                      <div class="score-bar-track"><div class="score-bar-fill" style="width:100.0%"></div></div>
-                      <div class="score-bar-val">32.0/32</div>
-                    </div>
-                    <div class="score-bar-row">
-                      <div class="score-bar-label">모멘텀</div>
-                      <div class="score-bar-track"><div class="score-bar-fill" style="width:57.0%"></div></div>
-                      <div class="score-bar-val">11.5/20</div>
-                    </div>
-                    <div class="score-bar-row">
-                      <div class="score-bar-label">거래량</div>
-                      <div class="score-bar-track"><div class="score-bar-fill" style="width:0.0%"></div></div>
-                      <div class="score-bar-val">0.0/15</div>
-                    </div>
-                    <div class="score-bar-row">
-                      <div class="score-bar-label">52주위치</div>
-                      <div class="score-bar-track"><div class="score-bar-fill" style="width:100.0%"></div></div>
-                      <div class="score-bar-val">15/15</div>
-                    </div>
-                  </div>
-                </div>
-
-                
-                <!-- Damodaran 투자 논리 -->
-                <div class="acc-section">
-                  <div class="ai-summary" style="margin:0">
-                    <div class="ai-summary-label">📖 Damodaran 투자 논리</div>
-                    <div class="ai-summary-text">[Consumer Staples] 산업 평균 동인. 종목별 차별화 요인 검토 후 진입 판단 필요.</div>
-                  </div>
-                </div>
-                
-
-                <!-- Damodaran 4파트 -->
-                <div class="acc-section">
-                  <div class="story-grid" style="margin:0;padding:0;border:none">
-                    <div class="story-cell">
-                      <div class="story-icon">🛡️ 해자 (Moat)</div>
-                      <div class="story-text">[일반 해자 패턴] 강력한 브랜드 · 유통 채널 장악 · 규모의 경제</div>
-                    </div>
-                    <div class="story-cell">
-                      <div class="story-icon">📈 성장 동인</div>
-                      <div class="story-text">[Consumer Staples] 필수재 가격 결정력 · 신흥국 소비 확대 · 프리미엄 카테고리</div>
-                    </div>
-                    <div class="story-cell">
-                      <div class="story-icon">⚠️ 리스크 요인</div>
-                      <div class="story-text">[Consumer Staples] 산업 사이클, 경쟁 강도, 규제 환경 변화에 따른 변동성</div>
-                    </div>
-                    <div class="story-cell">
-                      <div class="story-icon">🚀 메가트렌드</div>
-                      <div class="story-text">산업별 메가트렌드 관련성은 별도 검토 필요</div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- 정량 체크 -->
-                <div class="acc-section">
-                  <div class="story-grid" style="margin:0;padding:0;border:none">
-                    <div class="story-cell">
-                      <div class="story-icon">📊 위험 변화 (정량)</div>
-                      <div class="story-text">
-                        
-                        <strong class="check-pass">위험 감소 신호</strong><br>
-                        <span class="dim">부채 낮음(D/E&lt;50) · 매출 +20% · EPS +25%</span>
-                      </div>
-                    </div>
-                    <div class="story-cell">
-                      <div class="story-icon">💰 밸류에이션 (정량)</div>
-                      <div class="story-text">
-                        
-                        <strong class="check-pass">저평가 구간</strong><br>
-                        <span class="dim">PEG 1.20 ✓ · P/FCF 20 ✓ · PER 25</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- 리스크 알약 -->
-                <div class="acc-section">
-                  <div class="risk-pills" style="margin:0">
-                    <div class="risk-pill"><span class="lbl">기술</span>58</div>
-                    <div class="risk-pill"><span class="lbl">펀더</span>77</div>
-                    <div class="risk-pill"><span class="lbl">MDD</span>-21.9%</div>
-                    <div class="risk-pill"><span class="lbl">샤프</span>1.37</div>
-                    <div class="risk-pill"><span class="lbl">베타</span>—</div>
-                    <div class="risk-pill"><span class="lbl">알파</span>—</div>
-                    <div class="risk-pill"><span class="lbl">VaR95</span>-2.7%</div>
-                    <div class="risk-pill"><span class="lbl">스토리</span>성장기 (Expansion)</div>
-                  </div>
-                </div>
-
-              </div>
-            </td>
-          </tr>
-          
-          
-          <tr class="top10-row" onclick="toggleAccordion(this)" style="cursor:pointer">
-            <td><span class="acc-chevron">▶</span></td>
-            <td style="color:#7a7972">2</td>
-            <td class="ticker">XOM</td>
-            <td style="color:#b8b3a4;font-size:.84rem;max-width:160px;overflow:hidden;text-overflow:ellipsis">Exxon Mobil Corp.</td>
-            <td style="color:#7a7972;font-size:.78rem">Energy</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">$312.36</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">
-              +2.38%
-            </td>
-            <td><span style="color:#4ade80">✓</span></td>
-            <td style="text-align:right" class="score-cell score-md">66</td>
-            <td>
-              <span class="verdict v-watch">관심</span>
-              
-            </td>
-          </tr>
-          <tr class="top10-detail" style="display:none">
-            <td colspan="10" style="padding:0;background:#0e0d0a">
-              <div class="acc-content">
-
-                <!-- 점수 분해 -->
-                <div class="acc-section">
-                  <div class="acc-section-title">📊 점수 분해</div>
-                  <div class="score-breakdown" style="margin:0">
-                    <div class="score-bar-row">
-                      <div class="score-bar-label">추세</div>
-                      <div class="score-bar-track"><div class="score-bar-fill" style="width:100.0%"></div></div>
-                      <div class="score-bar-val">32.0/32</div>
-                    </div>
-                    <div class="score-bar-row">
-                      <div class="score-bar-label">모멘텀</div>
-                      <div class="score-bar-track"><div class="score-bar-fill" style="width:43.0%"></div></div>
-                      <div class="score-bar-val">8.7/20</div>
-                    </div>
-                    <div class="score-bar-row">
-                      <div class="score-bar-label">거래량</div>
-                      <div class="score-bar-track"><div class="score-bar-fill" style="width:0.0%"></div></div>
-                      <div class="score-bar-val">0.0/15</div>
-                    </div>
-                    <div class="score-bar-row">
-                      <div class="score-bar-label">52주위치</div>
-                      <div class="score-bar-track"><div class="score-bar-fill" style="width:100.0%"></div></div>
-                      <div class="score-bar-val">15/15</div>
-                    </div>
-                  </div>
-                </div>
-
-                
-                <!-- Damodaran 투자 논리 -->
-                <div class="acc-section">
-                  <div class="ai-summary" style="margin:0">
-                    <div class="ai-summary-label">📖 Damodaran 투자 논리</div>
-                    <div class="ai-summary-text">[Energy] 산업 평균 동인. 종목별 차별화 요인 검토 후 진입 판단 필요.</div>
-                  </div>
-                </div>
-                
-
-                <!-- Damodaran 4파트 -->
-                <div class="acc-section">
-                  <div class="story-grid" style="margin:0;padding:0;border:none">
-                    <div class="story-cell">
-                      <div class="story-icon">🛡️ 해자 (Moat)</div>
-                      <div class="story-text">[일반 해자 패턴] 매장량 · 인프라(파이프라인/터미널) · 통합 밸류체인</div>
-                    </div>
-                    <div class="story-cell">
-                      <div class="story-icon">📈 성장 동인</div>
-                      <div class="story-text">[Energy] 유가 사이클 · 에너지 안보 · LNG 수출 · 재생에너지 전환</div>
-                    </div>
-                    <div class="story-cell">
-                      <div class="story-icon">⚠️ 리스크 요인</div>
-                      <div class="story-text">[Energy] 산업 사이클, 경쟁 강도, 규제 환경 변화에 따른 변동성</div>
-                    </div>
-                    <div class="story-cell">
-                      <div class="story-icon">🚀 메가트렌드</div>
-                      <div class="story-text">산업별 메가트렌드 관련성은 별도 검토 필요</div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- 정량 체크 -->
-                <div class="acc-section">
-                  <div class="story-grid" style="margin:0;padding:0;border:none">
-                    <div class="story-cell">
-                      <div class="story-icon">📊 위험 변화 (정량)</div>
-                      <div class="story-text">
-                        
-                        <strong class="check-pass">위험 감소 신호</strong><br>
-                        <span class="dim">부채 낮음(D/E&lt;50) · 매출 +20% · EPS +25%</span>
-                      </div>
-                    </div>
-                    <div class="story-cell">
-                      <div class="story-icon">💰 밸류에이션 (정량)</div>
-                      <div class="story-text">
-                        
-                        <strong class="check-pass">저평가 구간</strong><br>
-                        <span class="dim">PEG 1.20 ✓ · P/FCF 20 ✓ · PER 25</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- 리스크 알약 -->
-                <div class="acc-section">
-                  <div class="risk-pills" style="margin:0">
-                    <div class="risk-pill"><span class="lbl">기술</span>56</div>
-                    <div class="risk-pill"><span class="lbl">펀더</span>77</div>
-                    <div class="risk-pill"><span class="lbl">MDD</span>-17.5%</div>
-                    <div class="risk-pill"><span class="lbl">샤프</span>0.66</div>
-                    <div class="risk-pill"><span class="lbl">베타</span>—</div>
-                    <div class="risk-pill"><span class="lbl">알파</span>—</div>
-                    <div class="risk-pill"><span class="lbl">VaR95</span>-3.2%</div>
-                    <div class="risk-pill"><span class="lbl">스토리</span>성장기 (Expansion)</div>
-                  </div>
-                </div>
-
-              </div>
-            </td>
-          </tr>
-          
-          
-          <tr class="top10-row" onclick="toggleAccordion(this)" style="cursor:pointer">
-            <td><span class="acc-chevron">▶</span></td>
-            <td style="color:#7a7972">3</td>
-            <td class="ticker">MA</td>
-            <td style="color:#b8b3a4;font-size:.84rem;max-width:160px;overflow:hidden;text-overflow:ellipsis">Mastercard Inc.</td>
-            <td style="color:#7a7972;font-size:.78rem">Financials</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">$523.57</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">
-              +1.68%
-            </td>
-            <td><span style="color:#4ade80">✓</span></td>
-            <td style="text-align:right" class="score-cell score-md">65</td>
-            <td>
-              <span class="verdict v-watch">관심</span>
-              
-            </td>
-          </tr>
-          <tr class="top10-detail" style="display:none">
-            <td colspan="10" style="padding:0;background:#0e0d0a">
-              <div class="acc-content">
-
-                <!-- 점수 분해 -->
-                <div class="acc-section">
-                  <div class="acc-section-title">📊 점수 분해</div>
-                  <div class="score-breakdown" style="margin:0">
-                    <div class="score-bar-row">
-                      <div class="score-bar-label">추세</div>
-                      <div class="score-bar-track"><div class="score-bar-fill" style="width:100.0%"></div></div>
-                      <div class="score-bar-val">32.0/32</div>
-                    </div>
-                    <div class="score-bar-row">
-                      <div class="score-bar-label">모멘텀</div>
-                      <div class="score-bar-track"><div class="score-bar-fill" style="width:28.0%"></div></div>
-                      <div class="score-bar-val">5.6/20</div>
-                    </div>
-                    <div class="score-bar-row">
-                      <div class="score-bar-label">거래량</div>
-                      <div class="score-bar-track"><div class="score-bar-fill" style="width:0.0%"></div></div>
-                      <div class="score-bar-val">0.0/15</div>
-                    </div>
-                    <div class="score-bar-row">
-                      <div class="score-bar-label">52주위치</div>
-                      <div class="score-bar-track"><div class="score-bar-fill" style="width:100.0%"></div></div>
-                      <div class="score-bar-val">15/15</div>
-                    </div>
-                  </div>
-                </div>
-
-                
-                <!-- Damodaran 투자 논리 -->
-                <div class="acc-section">
-                  <div class="ai-summary" style="margin:0">
-                    <div class="ai-summary-label">📖 Damodaran 투자 논리</div>
-                    <div class="ai-summary-text">[Financials] 산업 평균 동인. 종목별 차별화 요인 검토 후 진입 판단 필요.</div>
-                  </div>
-                </div>
-                
-
-                <!-- Damodaran 4파트 -->
-                <div class="acc-section">
-                  <div class="story-grid" style="margin:0;padding:0;border:none">
-                    <div class="story-cell">
-                      <div class="story-icon">🛡️ 해자 (Moat)</div>
-                      <div class="story-text">[일반 해자 패턴] 자본 규모 · 라이선스 진입장벽 · 고객 신뢰</div>
-                    </div>
-                    <div class="story-cell">
-                      <div class="story-icon">📈 성장 동인</div>
-                      <div class="story-text">[Financials] 금리 환경 · 자본시장 활성화 · 핀테크 전환 · 자산운용 규모</div>
-                    </div>
-                    <div class="story-cell">
-                      <div class="story-icon">⚠️ 리스크 요인</div>
-                      <div class="story-text">[Financials] 산업 사이클, 경쟁 강도, 규제 환경 변화에 따른 변동성</div>
-                    </div>
-                    <div class="story-cell">
-                      <div class="story-icon">🚀 메가트렌드</div>
-                      <div class="story-text">산업별 메가트렌드 관련성은 별도 검토 필요</div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- 정량 체크 -->
-                <div class="acc-section">
-                  <div class="story-grid" style="margin:0;padding:0;border:none">
-                    <div class="story-cell">
-                      <div class="story-icon">📊 위험 변화 (정량)</div>
-                      <div class="story-text">
-                        
-                        <strong class="check-pass">위험 감소 신호</strong><br>
-                        <span class="dim">부채 낮음(D/E&lt;50) · 매출 +20% · EPS +25%</span>
-                      </div>
-                    </div>
-                    <div class="story-cell">
-                      <div class="story-icon">💰 밸류에이션 (정량)</div>
-                      <div class="story-text">
-                        
-                        <strong class="check-pass">저평가 구간</strong><br>
-                        <span class="dim">PEG 1.20 ✓ · P/FCF 20 ✓ · PER 25</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- 리스크 알약 -->
-                <div class="acc-section">
-                  <div class="risk-pills" style="margin:0">
-                    <div class="risk-pill"><span class="lbl">기술</span>53</div>
-                    <div class="risk-pill"><span class="lbl">펀더</span>77</div>
-                    <div class="risk-pill"><span class="lbl">MDD</span>-13.8%</div>
-                    <div class="risk-pill"><span class="lbl">샤프</span>3.08</div>
-                    <div class="risk-pill"><span class="lbl">베타</span>—</div>
-                    <div class="risk-pill"><span class="lbl">알파</span>—</div>
-                    <div class="risk-pill"><span class="lbl">VaR95</span>-2.7%</div>
-                    <div class="risk-pill"><span class="lbl">스토리</span>성장기 (Expansion)</div>
-                  </div>
-                </div>
-
-              </div>
-            </td>
-          </tr>
-          
-          
-          <tr class="top10-row" onclick="toggleAccordion(this)" style="cursor:pointer">
-            <td><span class="acc-chevron">▶</span></td>
-            <td style="color:#7a7972">4</td>
-            <td class="ticker">COST</td>
-            <td style="color:#b8b3a4;font-size:.84rem;max-width:160px;overflow:hidden;text-overflow:ellipsis">Costco Wholesale Corp.</td>
-            <td style="color:#7a7972;font-size:.78rem">Consumer Staples</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">$346.24</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">
-              +1.47%
-            </td>
-            <td><span style="color:#4ade80">✓</span></td>
-            <td style="text-align:right" class="score-cell score-md">62</td>
-            <td>
-              <span class="verdict v-watch">관심</span>
-              
-            </td>
-          </tr>
-          <tr class="top10-detail" style="display:none">
-            <td colspan="10" style="padding:0;background:#0e0d0a">
-              <div class="acc-content">
-
-                <!-- 점수 분해 -->
-                <div class="acc-section">
-                  <div class="acc-section-title">📊 점수 분해</div>
-                  <div class="score-breakdown" style="margin:0">
-                    <div class="score-bar-row">
-                      <div class="score-bar-label">추세</div>
-                      <div class="score-bar-track"><div class="score-bar-fill" style="width:100.0%"></div></div>
-                      <div class="score-bar-val">32.0/32</div>
-                    </div>
-                    <div class="score-bar-row">
-                      <div class="score-bar-label">모멘텀</div>
-                      <div class="score-bar-track"><div class="score-bar-fill" style="width:50.0%"></div></div>
-                      <div class="score-bar-val">10.0/20</div>
-                    </div>
-                    <div class="score-bar-row">
-                      <div class="score-bar-label">거래량</div>
-                      <div class="score-bar-track"><div class="score-bar-fill" style="width:0.0%"></div></div>
-                      <div class="score-bar-val">0.0/15</div>
-                    </div>
-                    <div class="score-bar-row">
-                      <div class="score-bar-label">52주위치</div>
-                      <div class="score-bar-track"><div class="score-bar-fill" style="width:0.0%"></div></div>
-                      <div class="score-bar-val">0.0/15</div>
-                    </div>
-                  </div>
-                </div>
-
-                
-                <!-- Damodaran 투자 논리 -->
-                <div class="acc-section">
-                  <div class="ai-summary" style="margin:0">
-                    <div class="ai-summary-label">📖 Damodaran 투자 논리</div>
-                    <div class="ai-summary-text">[Consumer Staples] 산업 평균 동인. 종목별 차별화 요인 검토 후 진입 판단 필요.</div>
-                  </div>
-                </div>
-                
-
-                <!-- Damodaran 4파트 -->
-                <div class="acc-section">
-                  <div class="story-grid" style="margin:0;padding:0;border:none">
-                    <div class="story-cell">
-                      <div class="story-icon">🛡️ 해자 (Moat)</div>
-                      <div class="story-text">[일반 해자 패턴] 강력한 브랜드 · 유통 채널 장악 · 규모의 경제</div>
-                    </div>
-                    <div class="story-cell">
-                      <div class="story-icon">📈 성장 동인</div>
-                      <div class="story-text">[Consumer Staples] 필수재 가격 결정력 · 신흥국 소비 확대 · 프리미엄 카테고리</div>
-                    </div>
-                    <div class="story-cell">
-                      <div class="story-icon">⚠️ 리스크 요인</div>
-                      <div class="story-text">[Consumer Staples] 산업 사이클, 경쟁 강도, 규제 환경 변화에 따른 변동성</div>
-                    </div>
-                    <div class="story-cell">
-                      <div class="story-icon">🚀 메가트렌드</div>
-                      <div class="story-text">산업별 메가트렌드 관련성은 별도 검토 필요</div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- 정량 체크 -->
-                <div class="acc-section">
-                  <div class="story-grid" style="margin:0;padding:0;border:none">
-                    <div class="story-cell">
-                      <div class="story-icon">📊 위험 변화 (정량)</div>
-                      <div class="story-text">
-                        
-                        <strong class="check-pass">위험 감소 신호</strong><br>
-                        <span class="dim">부채 낮음(D/E&lt;50) · 매출 +20% · EPS +25%</span>
-                      </div>
-                    </div>
-                    <div class="story-cell">
-                      <div class="story-icon">💰 밸류에이션 (정량)</div>
-                      <div class="story-text">
-                        
-                        <strong class="check-pass">저평가 구간</strong><br>
-                        <span class="dim">PEG 1.20 ✓ · P/FCF 20 ✓ · PER 25</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- 리스크 알약 -->
-                <div class="acc-section">
-                  <div class="risk-pills" style="margin:0">
-                    <div class="risk-pill"><span class="lbl">기술</span>48</div>
-                    <div class="risk-pill"><span class="lbl">펀더</span>77</div>
-                    <div class="risk-pill"><span class="lbl">MDD</span>-48.8%</div>
-                    <div class="risk-pill"><span class="lbl">샤프</span>-1.28</div>
-                    <div class="risk-pill"><span class="lbl">베타</span>—</div>
-                    <div class="risk-pill"><span class="lbl">알파</span>—</div>
-                    <div class="risk-pill"><span class="lbl">VaR95</span>-2.8%</div>
-                    <div class="risk-pill"><span class="lbl">스토리</span>성장기 (Expansion)</div>
-                  </div>
-                </div>
-
-              </div>
-            </td>
-          </tr>
-          
-          
-          <tr class="top10-row" onclick="toggleAccordion(this)" style="cursor:pointer">
-            <td><span class="acc-chevron">▶</span></td>
-            <td style="color:#7a7972">5</td>
-            <td class="ticker">AMZN</td>
-            <td style="color:#b8b3a4;font-size:.84rem;max-width:160px;overflow:hidden;text-overflow:ellipsis">Amazon.com Inc.</td>
-            <td style="color:#7a7972;font-size:.78rem">Consumer Discretiona</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">$264.19</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="down">
-              -1.45%
-            </td>
-            <td><span style="color:#4ade80">✓</span></td>
-            <td style="text-align:right" class="score-cell score-md">62</td>
-            <td>
-              <span class="verdict v-watch">관심</span>
-              
-            </td>
-          </tr>
-          <tr class="top10-detail" style="display:none">
-            <td colspan="10" style="padding:0;background:#0e0d0a">
-              <div class="acc-content">
-
-                <!-- 점수 분해 -->
-                <div class="acc-section">
-                  <div class="acc-section-title">📊 점수 분해</div>
-                  <div class="score-breakdown" style="margin:0">
-                    <div class="score-bar-row">
-                      <div class="score-bar-label">추세</div>
-                      <div class="score-bar-track"><div class="score-bar-fill" style="width:100.0%"></div></div>
-                      <div class="score-bar-val">32.0/32</div>
-                    </div>
-                    <div class="score-bar-row">
-                      <div class="score-bar-label">모멘텀</div>
-                      <div class="score-bar-track"><div class="score-bar-fill" style="width:29.0%"></div></div>
-                      <div class="score-bar-val">5.7/20</div>
-                    </div>
-                    <div class="score-bar-row">
-                      <div class="score-bar-label">거래량</div>
-                      <div class="score-bar-track"><div class="score-bar-fill" style="width:0.0%"></div></div>
-                      <div class="score-bar-val">0.0/15</div>
-                    </div>
-                    <div class="score-bar-row">
-                      <div class="score-bar-label">52주위치</div>
-                      <div class="score-bar-track"><div class="score-bar-fill" style="width:67.0%"></div></div>
-                      <div class="score-bar-val">10/15</div>
-                    </div>
-                  </div>
-                </div>
-
-                
-                <!-- Damodaran 투자 논리 -->
-                <div class="acc-section">
-                  <div class="ai-summary" style="margin:0">
-                    <div class="ai-summary-label">📖 Damodaran 투자 논리</div>
-                    <div class="ai-summary-text">[Consumer Discretionary] 산업 평균 동인. 종목별 차별화 요인 검토 후 진입 판단 필요.</div>
-                  </div>
-                </div>
-                
-
-                <!-- Damodaran 4파트 -->
-                <div class="acc-section">
-                  <div class="story-grid" style="margin:0;padding:0;border:none">
-                    <div class="story-cell">
-                      <div class="story-icon">🛡️ 해자 (Moat)</div>
-                      <div class="story-text">[일반 해자 패턴] 브랜드 가치 · 유통망 · 멤버십/회원 락인</div>
-                    </div>
-                    <div class="story-cell">
-                      <div class="story-icon">📈 성장 동인</div>
-                      <div class="story-text">[Consumer Discretionary] 소비 회복 · 프리미엄화 · E커머스 · 여행 수요 회복</div>
-                    </div>
-                    <div class="story-cell">
-                      <div class="story-icon">⚠️ 리스크 요인</div>
-                      <div class="story-text">[Consumer Discretionary] 산업 사이클, 경쟁 강도, 규제 환경 변화에 따른 변동성</div>
-                    </div>
-                    <div class="story-cell">
-                      <div class="story-icon">🚀 메가트렌드</div>
-                      <div class="story-text">산업별 메가트렌드 관련성은 별도 검토 필요</div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- 정량 체크 -->
-                <div class="acc-section">
-                  <div class="story-grid" style="margin:0;padding:0;border:none">
-                    <div class="story-cell">
-                      <div class="story-icon">📊 위험 변화 (정량)</div>
-                      <div class="story-text">
-                        
-                        <strong class="check-pass">위험 감소 신호</strong><br>
-                        <span class="dim">부채 낮음(D/E&lt;50) · 매출 +20% · EPS +25%</span>
-                      </div>
-                    </div>
-                    <div class="story-cell">
-                      <div class="story-icon">💰 밸류에이션 (정량)</div>
-                      <div class="story-text">
-                        
-                        <strong class="check-pass">저평가 구간</strong><br>
-                        <span class="dim">PEG 1.20 ✓ · P/FCF 20 ✓ · PER 25</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- 리스크 알약 -->
-                <div class="acc-section">
-                  <div class="risk-pills" style="margin:0">
-                    <div class="risk-pill"><span class="lbl">기술</span>48</div>
-                    <div class="risk-pill"><span class="lbl">펀더</span>77</div>
-                    <div class="risk-pill"><span class="lbl">MDD</span>-20.7%</div>
-                    <div class="risk-pill"><span class="lbl">샤프</span>2.47</div>
-                    <div class="risk-pill"><span class="lbl">베타</span>—</div>
-                    <div class="risk-pill"><span class="lbl">알파</span>—</div>
-                    <div class="risk-pill"><span class="lbl">VaR95</span>-2.6%</div>
-                    <div class="risk-pill"><span class="lbl">스토리</span>성장기 (Expansion)</div>
-                  </div>
-                </div>
-
-              </div>
-            </td>
-          </tr>
-          
-          
-          <tr class="top10-row" onclick="toggleAccordion(this)" style="cursor:pointer">
-            <td><span class="acc-chevron">▶</span></td>
-            <td style="color:#7a7972">6</td>
-            <td class="ticker">TSLA</td>
-            <td style="color:#b8b3a4;font-size:.84rem;max-width:160px;overflow:hidden;text-overflow:ellipsis">Tesla Inc.</td>
-            <td style="color:#7a7972;font-size:.78rem">Consumer Discretiona</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">$333.48</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="down">
-              -0.69%
-            </td>
-            <td><span style="color:#4ade80">✓</span></td>
-            <td style="text-align:right" class="score-cell score-md">60</td>
-            <td>
-              <span class="verdict v-watch">관심</span>
-              
-            </td>
-          </tr>
-          <tr class="top10-detail" style="display:none">
-            <td colspan="10" style="padding:0;background:#0e0d0a">
-              <div class="acc-content">
-
-                <!-- 점수 분해 -->
-                <div class="acc-section">
-                  <div class="acc-section-title">📊 점수 분해</div>
-                  <div class="score-breakdown" style="margin:0">
-                    <div class="score-bar-row">
-                      <div class="score-bar-label">추세</div>
-                      <div class="score-bar-track"><div class="score-bar-fill" style="width:100.0%"></div></div>
-                      <div class="score-bar-val">32.0/32</div>
-                    </div>
-                    <div class="score-bar-row">
-                      <div class="score-bar-label">모멘텀</div>
-                      <div class="score-bar-track"><div class="score-bar-fill" style="width:10.0%"></div></div>
-                      <div class="score-bar-val">1.9/20</div>
-                    </div>
-                    <div class="score-bar-row">
-                      <div class="score-bar-label">거래량</div>
-                      <div class="score-bar-track"><div class="score-bar-fill" style="width:0.0%"></div></div>
-                      <div class="score-bar-val">0.0/15</div>
-                    </div>
-                    <div class="score-bar-row">
-                      <div class="score-bar-label">52주위치</div>
-                      <div class="score-bar-track"><div class="score-bar-fill" style="width:67.0%"></div></div>
-                      <div class="score-bar-val">10/15</div>
-                    </div>
-                  </div>
-                </div>
-
-                
-                <!-- Damodaran 투자 논리 -->
-                <div class="acc-section">
-                  <div class="ai-summary" style="margin:0">
-                    <div class="ai-summary-label">📖 Damodaran 투자 논리</div>
-                    <div class="ai-summary-text">[Consumer Discretionary] 산업 평균 동인. 종목별 차별화 요인 검토 후 진입 판단 필요.</div>
-                  </div>
-                </div>
-                
-
-                <!-- Damodaran 4파트 -->
-                <div class="acc-section">
-                  <div class="story-grid" style="margin:0;padding:0;border:none">
-                    <div class="story-cell">
-                      <div class="story-icon">🛡️ 해자 (Moat)</div>
-                      <div class="story-text">[일반 해자 패턴] 브랜드 가치 · 유통망 · 멤버십/회원 락인</div>
-                    </div>
-                    <div class="story-cell">
-                      <div class="story-icon">📈 성장 동인</div>
-                      <div class="story-text">[Consumer Discretionary] 소비 회복 · 프리미엄화 · E커머스 · 여행 수요 회복</div>
-                    </div>
-                    <div class="story-cell">
-                      <div class="story-icon">⚠️ 리스크 요인</div>
-                      <div class="story-text">[Consumer Discretionary] 산업 사이클, 경쟁 강도, 규제 환경 변화에 따른 변동성</div>
-                    </div>
-                    <div class="story-cell">
-                      <div class="story-icon">🚀 메가트렌드</div>
-                      <div class="story-text">산업별 메가트렌드 관련성은 별도 검토 필요</div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- 정량 체크 -->
-                <div class="acc-section">
-                  <div class="story-grid" style="margin:0;padding:0;border:none">
-                    <div class="story-cell">
-                      <div class="story-icon">📊 위험 변화 (정량)</div>
-                      <div class="story-text">
-                        
-                        <strong class="check-pass">위험 감소 신호</strong><br>
-                        <span class="dim">부채 낮음(D/E&lt;50) · 매출 +20% · EPS +25%</span>
-                      </div>
-                    </div>
-                    <div class="story-cell">
-                      <div class="story-icon">💰 밸류에이션 (정량)</div>
-                      <div class="story-text">
-                        
-                        <strong class="check-pass">저평가 구간</strong><br>
-                        <span class="dim">PEG 1.20 ✓ · P/FCF 20 ✓ · PER 25</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- 리스크 알약 -->
-                <div class="acc-section">
-                  <div class="risk-pills" style="margin:0">
-                    <div class="risk-pill"><span class="lbl">기술</span>44</div>
-                    <div class="risk-pill"><span class="lbl">펀더</span>77</div>
-                    <div class="risk-pill"><span class="lbl">MDD</span>-13.3%</div>
-                    <div class="risk-pill"><span class="lbl">샤프</span>2.01</div>
-                    <div class="risk-pill"><span class="lbl">베타</span>—</div>
-                    <div class="risk-pill"><span class="lbl">알파</span>—</div>
-                    <div class="risk-pill"><span class="lbl">VaR95</span>-2.4%</div>
-                    <div class="risk-pill"><span class="lbl">스토리</span>성장기 (Expansion)</div>
-                  </div>
-                </div>
-
-              </div>
-            </td>
-          </tr>
-          
-          
-          <tr class="top10-row" onclick="toggleAccordion(this)" style="cursor:pointer">
-            <td><span class="acc-chevron">▶</span></td>
-            <td style="color:#7a7972">7</td>
-            <td class="ticker">JPM</td>
-            <td style="color:#b8b3a4;font-size:.84rem;max-width:160px;overflow:hidden;text-overflow:ellipsis">JPMorgan Chase &amp; Co.</td>
-            <td style="color:#7a7972;font-size:.78rem">Financials</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">$655.02</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">
-              +0.64%
-            </td>
-            <td><span style="color:#4ade80">✓</span></td>
-            <td style="text-align:right" class="score-cell score-md">60</td>
-            <td>
-              <span class="verdict v-watch">관심</span>
-              
-            </td>
-          </tr>
-          <tr class="top10-detail" style="display:none">
-            <td colspan="10" style="padding:0;background:#0e0d0a">
-              <div class="acc-content">
-
-                <!-- 점수 분해 -->
-                <div class="acc-section">
-                  <div class="acc-section-title">📊 점수 분해</div>
-                  <div class="score-breakdown" style="margin:0">
-                    <div class="score-bar-row">
-                      <div class="score-bar-label">추세</div>
-                      <div class="score-bar-track"><div class="score-bar-fill" style="width:100.0%"></div></div>
-                      <div class="score-bar-val">32.0/32</div>
-                    </div>
-                    <div class="score-bar-row">
-                      <div class="score-bar-label">모멘텀</div>
-                      <div class="score-bar-track"><div class="score-bar-fill" style="width:57.0%"></div></div>
-                      <div class="score-bar-val">11.3/20</div>
-                    </div>
-                    <div class="score-bar-row">
-                      <div class="score-bar-label">거래량</div>
-                      <div class="score-bar-track"><div class="score-bar-fill" style="width:0.0%"></div></div>
-                      <div class="score-bar-val">0.0/15</div>
-                    </div>
-                    <div class="score-bar-row">
-                      <div class="score-bar-label">52주위치</div>
-                      <div class="score-bar-track"><div class="score-bar-fill" style="width:0.0%"></div></div>
-                      <div class="score-bar-val">0.0/15</div>
-                    </div>
-                  </div>
-                </div>
-
-                
-                <!-- Damodaran 투자 논리 -->
-                <div class="acc-section">
-                  <div class="ai-summary" style="margin:0">
-                    <div class="ai-summary-label">📖 Damodaran 투자 논리</div>
-                    <div class="ai-summary-text">[Financials] 산업 평균 동인. 종목별 차별화 요인 검토 후 진입 판단 필요.</div>
-                  </div>
-                </div>
-                
-
-                <!-- Damodaran 4파트 -->
-                <div class="acc-section">
-                  <div class="story-grid" style="margin:0;padding:0;border:none">
-                    <div class="story-cell">
-                      <div class="story-icon">🛡️ 해자 (Moat)</div>
-                      <div class="story-text">[일반 해자 패턴] 자본 규모 · 라이선스 진입장벽 · 고객 신뢰</div>
-                    </div>
-                    <div class="story-cell">
-                      <div class="story-icon">📈 성장 동인</div>
-                      <div class="story-text">[Financials] 금리 환경 · 자본시장 활성화 · 핀테크 전환 · 자산운용 규모</div>
-                    </div>
-                    <div class="story-cell">
-                      <div class="story-icon">⚠️ 리스크 요인</div>
-                      <div class="story-text">[Financials] 산업 사이클, 경쟁 강도, 규제 환경 변화에 따른 변동성</div>
-                    </div>
-                    <div class="story-cell">
-                      <div class="story-icon">🚀 메가트렌드</div>
-                      <div class="story-text">산업별 메가트렌드 관련성은 별도 검토 필요</div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- 정량 체크 -->
-                <div class="acc-section">
-                  <div class="story-grid" style="margin:0;padding:0;border:none">
-                    <div class="story-cell">
-                      <div class="story-icon">📊 위험 변화 (정량)</div>
-                      <div class="story-text">
-                        
-                        <strong class="check-pass">위험 감소 신호</strong><br>
-                        <span class="dim">부채 낮음(D/E&lt;50) · 매출 +20% · EPS +25%</span>
-                      </div>
-                    </div>
-                    <div class="story-cell">
-                      <div class="story-icon">💰 밸류에이션 (정량)</div>
-                      <div class="story-text">
-                        
-                        <strong class="check-pass">저평가 구간</strong><br>
-                        <span class="dim">PEG 1.20 ✓ · P/FCF 20 ✓ · PER 25</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- 리스크 알약 -->
-                <div class="acc-section">
-                  <div class="risk-pills" style="margin:0">
-                    <div class="risk-pill"><span class="lbl">기술</span>43</div>
-                    <div class="risk-pill"><span class="lbl">펀더</span>77</div>
-                    <div class="risk-pill"><span class="lbl">MDD</span>-10.9%</div>
-                    <div class="risk-pill"><span class="lbl">샤프</span>2.70</div>
-                    <div class="risk-pill"><span class="lbl">베타</span>—</div>
-                    <div class="risk-pill"><span class="lbl">알파</span>—</div>
-                    <div class="risk-pill"><span class="lbl">VaR95</span>-2.6%</div>
-                    <div class="risk-pill"><span class="lbl">스토리</span>성장기 (Expansion)</div>
-                  </div>
-                </div>
-
-              </div>
-            </td>
-          </tr>
-          
-          
-          <tr class="top10-row" onclick="toggleAccordion(this)" style="cursor:pointer">
-            <td><span class="acc-chevron">▶</span></td>
-            <td style="color:#7a7972">8</td>
-            <td class="ticker">GOOG</td>
-            <td style="color:#b8b3a4;font-size:.84rem;max-width:160px;overflow:hidden;text-overflow:ellipsis">Alphabet Inc. Class C</td>
-            <td style="color:#7a7972;font-size:.78rem">Communication Servic</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">$142.08</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">
-              +0.53%
-            </td>
-            <td><span style="color:#4ade80">✓</span></td>
-            <td style="text-align:right" class="score-cell score-md">58</td>
-            <td>
-              <span class="verdict v-watch">관심</span>
-              
-            </td>
-          </tr>
-          <tr class="top10-detail" style="display:none">
-            <td colspan="10" style="padding:0;background:#0e0d0a">
-              <div class="acc-content">
-
-                <!-- 점수 분해 -->
-                <div class="acc-section">
-                  <div class="acc-section-title">📊 점수 분해</div>
-                  <div class="score-breakdown" style="margin:0">
-                    <div class="score-bar-row">
-                      <div class="score-bar-label">추세</div>
-                      <div class="score-bar-track"><div class="score-bar-fill" style="width:100.0%"></div></div>
-                      <div class="score-bar-val">32.0/32</div>
-                    </div>
-                    <div class="score-bar-row">
-                      <div class="score-bar-label">모멘텀</div>
-                      <div class="score-bar-track"><div class="score-bar-fill" style="width:8.0%"></div></div>
-                      <div class="score-bar-val">1.5/20</div>
-                    </div>
-                    <div class="score-bar-row">
-                      <div class="score-bar-label">거래량</div>
-                      <div class="score-bar-track"><div class="score-bar-fill" style="width:0.0%"></div></div>
-                      <div class="score-bar-val">0.0/15</div>
-                    </div>
-                    <div class="score-bar-row">
-                      <div class="score-bar-label">52주위치</div>
-                      <div class="score-bar-track"><div class="score-bar-fill" style="width:33.0%"></div></div>
-                      <div class="score-bar-val">5/15</div>
-                    </div>
-                  </div>
-                </div>
-
-                
-                <!-- Damodaran 투자 논리 -->
-                <div class="acc-section">
-                  <div class="ai-summary" style="margin:0">
-                    <div class="ai-summary-label">📖 Damodaran 투자 논리</div>
-                    <div class="ai-summary-text">[Communication Services] 산업 평균 동인. 종목별 차별화 요인 검토 후 진입 판단 필요.</div>
-                  </div>
-                </div>
-                
-
-                <!-- Damodaran 4파트 -->
-                <div class="acc-section">
-                  <div class="story-grid" style="margin:0;padding:0;border:none">
-                    <div class="story-cell">
-                      <div class="story-icon">🛡️ 해자 (Moat)</div>
-                      <div class="story-text">[일반 해자 패턴] 사용자 네트워크 효과 · 콘텐츠 라이브러리 · 주파수 라이선스</div>
-                    </div>
-                    <div class="story-cell">
-                      <div class="story-icon">📈 성장 동인</div>
-                      <div class="story-text">[Communication Services] 디지털 광고 · 스트리밍 가입자 · AI 콘텐츠 · 통신 인프라</div>
-                    </div>
-                    <div class="story-cell">
-                      <div class="story-icon">⚠️ 리스크 요인</div>
-                      <div class="story-text">[Communication Services] 산업 사이클, 경쟁 강도, 규제 환경 변화에 따른 변동성</div>
-                    </div>
-                    <div class="story-cell">
-                      <div class="story-icon">🚀 메가트렌드</div>
-                      <div class="story-text">산업별 메가트렌드 관련성은 별도 검토 필요</div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- 정량 체크 -->
-                <div class="acc-section">
-                  <div class="story-grid" style="margin:0;padding:0;border:none">
-                    <div class="story-cell">
-                      <div class="story-icon">📊 위험 변화 (정량)</div>
-                      <div class="story-text">
-                        
-                        <strong class="check-pass">위험 감소 신호</strong><br>
-                        <span class="dim">부채 낮음(D/E&lt;50) · 매출 +20% · EPS +25%</span>
-                      </div>
-                    </div>
-                    <div class="story-cell">
-                      <div class="story-icon">💰 밸류에이션 (정량)</div>
-                      <div class="story-text">
-                        
-                        <strong class="check-pass">저평가 구간</strong><br>
-                        <span class="dim">PEG 1.20 ✓ · P/FCF 20 ✓ · PER 25</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- 리스크 알약 -->
-                <div class="acc-section">
-                  <div class="risk-pills" style="margin:0">
-                    <div class="risk-pill"><span class="lbl">기술</span>38</div>
-                    <div class="risk-pill"><span class="lbl">펀더</span>77</div>
-                    <div class="risk-pill"><span class="lbl">MDD</span>-21.3%</div>
-                    <div class="risk-pill"><span class="lbl">샤프</span>1.86</div>
-                    <div class="risk-pill"><span class="lbl">베타</span>—</div>
-                    <div class="risk-pill"><span class="lbl">알파</span>—</div>
-                    <div class="risk-pill"><span class="lbl">VaR95</span>-3.1%</div>
-                    <div class="risk-pill"><span class="lbl">스토리</span>성장기 (Expansion)</div>
-                  </div>
-                </div>
-
-              </div>
-            </td>
-          </tr>
-          
-          
-          <tr class="top10-row" onclick="toggleAccordion(this)" style="cursor:pointer">
-            <td><span class="acc-chevron">▶</span></td>
-            <td style="color:#7a7972">9</td>
-            <td class="ticker">META</td>
-            <td style="color:#b8b3a4;font-size:.84rem;max-width:160px;overflow:hidden;text-overflow:ellipsis">Meta Platforms Inc.</td>
-            <td style="color:#7a7972;font-size:.78rem">Communication Servic</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">$78.42</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">
-              +2.07%
-            </td>
-            <td><span style="color:#4ade80">✓</span></td>
-            <td style="text-align:right" class="score-cell score-md">57</td>
-            <td>
-              <span class="verdict v-watch">관심</span>
-              
-            </td>
-          </tr>
-          <tr class="top10-detail" style="display:none">
-            <td colspan="10" style="padding:0;background:#0e0d0a">
-              <div class="acc-content">
-
-                <!-- 점수 분해 -->
-                <div class="acc-section">
-                  <div class="acc-section-title">📊 점수 분해</div>
-                  <div class="score-breakdown" style="margin:0">
-                    <div class="score-bar-row">
-                      <div class="score-bar-label">추세</div>
-                      <div class="score-bar-track"><div class="score-bar-fill" style="width:100.0%"></div></div>
-                      <div class="score-bar-val">32.0/32</div>
-                    </div>
-                    <div class="score-bar-row">
-                      <div class="score-bar-label">모멘텀</div>
-                      <div class="score-bar-track"><div class="score-bar-fill" style="width:28.0%"></div></div>
-                      <div class="score-bar-val">5.6/20</div>
-                    </div>
-                    <div class="score-bar-row">
-                      <div class="score-bar-label">거래량</div>
-                      <div class="score-bar-track"><div class="score-bar-fill" style="width:0.0%"></div></div>
-                      <div class="score-bar-val">0.0/15</div>
-                    </div>
-                    <div class="score-bar-row">
-                      <div class="score-bar-label">52주위치</div>
-                      <div class="score-bar-track"><div class="score-bar-fill" style="width:0.0%"></div></div>
-                      <div class="score-bar-val">0.0/15</div>
-                    </div>
-                  </div>
-                </div>
-
-                
-                <!-- Damodaran 투자 논리 -->
-                <div class="acc-section">
-                  <div class="ai-summary" style="margin:0">
-                    <div class="ai-summary-label">📖 Damodaran 투자 논리</div>
-                    <div class="ai-summary-text">[Communication Services] 산업 평균 동인. 종목별 차별화 요인 검토 후 진입 판단 필요.</div>
-                  </div>
-                </div>
-                
-
-                <!-- Damodaran 4파트 -->
-                <div class="acc-section">
-                  <div class="story-grid" style="margin:0;padding:0;border:none">
-                    <div class="story-cell">
-                      <div class="story-icon">🛡️ 해자 (Moat)</div>
-                      <div class="story-text">[일반 해자 패턴] 사용자 네트워크 효과 · 콘텐츠 라이브러리 · 주파수 라이선스</div>
-                    </div>
-                    <div class="story-cell">
-                      <div class="story-icon">📈 성장 동인</div>
-                      <div class="story-text">[Communication Services] 디지털 광고 · 스트리밍 가입자 · AI 콘텐츠 · 통신 인프라</div>
-                    </div>
-                    <div class="story-cell">
-                      <div class="story-icon">⚠️ 리스크 요인</div>
-                      <div class="story-text">[Communication Services] 산업 사이클, 경쟁 강도, 규제 환경 변화에 따른 변동성</div>
-                    </div>
-                    <div class="story-cell">
-                      <div class="story-icon">🚀 메가트렌드</div>
-                      <div class="story-text">산업별 메가트렌드 관련성은 별도 검토 필요</div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- 정량 체크 -->
-                <div class="acc-section">
-                  <div class="story-grid" style="margin:0;padding:0;border:none">
-                    <div class="story-cell">
-                      <div class="story-icon">📊 위험 변화 (정량)</div>
-                      <div class="story-text">
-                        
-                        <strong class="check-pass">위험 감소 신호</strong><br>
-                        <span class="dim">부채 낮음(D/E&lt;50) · 매출 +20% · EPS +25%</span>
-                      </div>
-                    </div>
-                    <div class="story-cell">
-                      <div class="story-icon">💰 밸류에이션 (정량)</div>
-                      <div class="story-text">
-                        
-                        <strong class="check-pass">저평가 구간</strong><br>
-                        <span class="dim">PEG 1.20 ✓ · P/FCF 20 ✓ · PER 25</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- 리스크 알약 -->
-                <div class="acc-section">
-                  <div class="risk-pills" style="margin:0">
-                    <div class="risk-pill"><span class="lbl">기술</span>38</div>
-                    <div class="risk-pill"><span class="lbl">펀더</span>77</div>
-                    <div class="risk-pill"><span class="lbl">MDD</span>-14.5%</div>
-                    <div class="risk-pill"><span class="lbl">샤프</span>2.04</div>
-                    <div class="risk-pill"><span class="lbl">베타</span>—</div>
-                    <div class="risk-pill"><span class="lbl">알파</span>—</div>
-                    <div class="risk-pill"><span class="lbl">VaR95</span>-2.8%</div>
-                    <div class="risk-pill"><span class="lbl">스토리</span>성장기 (Expansion)</div>
-                  </div>
-                </div>
-
-              </div>
-            </td>
-          </tr>
-          
-          
-          <tr class="top10-row" onclick="toggleAccordion(this)" style="cursor:pointer">
-            <td><span class="acc-chevron">▶</span></td>
-            <td style="color:#7a7972">10</td>
-            <td class="ticker">NVDA</td>
-            <td style="color:#b8b3a4;font-size:.84rem;max-width:160px;overflow:hidden;text-overflow:ellipsis">NVIDIA Corp.</td>
-            <td style="color:#7a7972;font-size:.78rem">Technology</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">$563.80</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="down">
-              -2.79%
-            </td>
-            <td><span style="color:#4ade80">✓</span></td>
-            <td style="text-align:right" class="score-cell score-md">57</td>
-            <td>
-              <span class="verdict v-watch">관심</span>
-              
-            </td>
-          </tr>
-          <tr class="top10-detail" style="display:none">
-            <td colspan="10" style="padding:0;background:#0e0d0a">
-              <div class="acc-content">
-
-                <!-- 점수 분해 -->
-                <div class="acc-section">
-                  <div class="acc-section-title">📊 점수 분해</div>
-                  <div class="score-breakdown" style="margin:0">
-                    <div class="score-bar-row">
-                      <div class="score-bar-label">추세</div>
-                      <div class="score-bar-track"><div class="score-bar-fill" style="width:100.0%"></div></div>
-                      <div class="score-bar-val">32.0/32</div>
-                    </div>
-                    <div class="score-bar-row">
-                      <div class="score-bar-label">모멘텀</div>
-                      <div class="score-bar-track"><div class="score-bar-fill" style="width:0.0%"></div></div>
-                      <div class="score-bar-val">0.0/20</div>
-                    </div>
-                    <div class="score-bar-row">
-                      <div class="score-bar-label">거래량</div>
-                      <div class="score-bar-track"><div class="score-bar-fill" style="width:0.0%"></div></div>
-                      <div class="score-bar-val">0.0/15</div>
-                    </div>
-                    <div class="score-bar-row">
-                      <div class="score-bar-label">52주위치</div>
-                      <div class="score-bar-track"><div class="score-bar-fill" style="width:33.0%"></div></div>
-                      <div class="score-bar-val">5/15</div>
-                    </div>
-                  </div>
-                </div>
-
-                
-                <!-- Damodaran 투자 논리 -->
-                <div class="acc-section">
-                  <div class="ai-summary" style="margin:0">
-                    <div class="ai-summary-label">📖 Damodaran 투자 논리</div>
-                    <div class="ai-summary-text">[Technology] 산업 평균 동인. 종목별 차별화 요인 검토 후 진입 판단 필요.</div>
-                  </div>
-                </div>
-                
-
-                <!-- Damodaran 4파트 -->
-                <div class="acc-section">
-                  <div class="story-grid" style="margin:0;padding:0;border:none">
-                    <div class="story-cell">
-                      <div class="story-icon">🛡️ 해자 (Moat)</div>
-                      <div class="story-text">[일반 해자 패턴] 기술 격차 · 네트워크 효과 · 전환 비용 · 데이터 축적</div>
-                    </div>
-                    <div class="story-cell">
-                      <div class="story-icon">📈 성장 동인</div>
-                      <div class="story-text">[Technology] AI/클라우드 인프라 수요 · 디지털 전환 · 반도체 사이클</div>
-                    </div>
-                    <div class="story-cell">
-                      <div class="story-icon">⚠️ 리스크 요인</div>
-                      <div class="story-text">[Technology] 산업 사이클, 경쟁 강도, 규제 환경 변화에 따른 변동성</div>
-                    </div>
-                    <div class="story-cell">
-                      <div class="story-icon">🚀 메가트렌드</div>
-                      <div class="story-text">산업별 메가트렌드 관련성은 별도 검토 필요</div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- 정량 체크 -->
-                <div class="acc-section">
-                  <div class="story-grid" style="margin:0;padding:0;border:none">
-                    <div class="story-cell">
-                      <div class="story-icon">📊 위험 변화 (정량)</div>
-                      <div class="story-text">
-                        
-                        <strong class="check-pass">위험 감소 신호</strong><br>
-                        <span class="dim">부채 낮음(D/E&lt;50) · 매출 +20% · EPS +25%</span>
-                      </div>
-                    </div>
-                    <div class="story-cell">
-                      <div class="story-icon">💰 밸류에이션 (정량)</div>
-                      <div class="story-text">
-                        
-                        <strong class="check-pass">저평가 구간</strong><br>
-                        <span class="dim">PEG 1.20 ✓ · P/FCF 20 ✓ · PER 25</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- 리스크 알약 -->
-                <div class="acc-section">
-                  <div class="risk-pills" style="margin:0">
-                    <div class="risk-pill"><span class="lbl">기술</span>37</div>
-                    <div class="risk-pill"><span class="lbl">펀더</span>77</div>
-                    <div class="risk-pill"><span class="lbl">MDD</span>-17.1%</div>
-                    <div class="risk-pill"><span class="lbl">샤프</span>1.51</div>
-                    <div class="risk-pill"><span class="lbl">베타</span>—</div>
-                    <div class="risk-pill"><span class="lbl">알파</span>—</div>
-                    <div class="risk-pill"><span class="lbl">VaR95</span>-3.0%</div>
-                    <div class="risk-pill"><span class="lbl">스토리</span>성장기 (Expansion)</div>
-                  </div>
-                </div>
-
-              </div>
-            </td>
-          </tr>
-          
+          {% else %}
+          <tr><td colspan="14" style="text-align:center;color:#7a7972;padding:1.5rem">데이터 없음</td></tr>
+          {% endfor %}
         </tbody>
       </table>
     </div>
-  </div>
-
-  <div style="margin-top:.8rem;padding:.7rem 1rem;background:var(--bg3);border-left:3px solid var(--gold);font-size:.84rem;color:var(--gray);line-height:1.7;border-radius:2px">
-    💡 행을 클릭하면 그 종목의 점수 분해, Damodaran 5파트 분석, 정량 체크, 리스크 지표가 펼쳐집니다.
   </div>
 </div>
 
@@ -1957,62 +418,12 @@ td{padding:.72rem .5rem;border-bottom:1px solid rgba(212,178,94,.08);color:var(-
       <div class="tbl-wrap"><table>
         <thead><tr><th>티커</th><th>이름</th><th style="text-align:right">등락</th><th style="text-align:right">점수</th></tr></thead>
         <tbody>
-          
-          <tr><td class="ticker">XOM</td><td style="color:#b8b3a4;font-size:.82rem">Exxon Mobil Corp.</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">+2.38%</td>
-            <td style="text-align:right" class="score-cell score-md">66</td>
+          {% for r in highlights.top_gainers %}
+          <tr><td class="ticker">{{ r.ticker }}</td><td style="color:#b8b3a4;font-size:.82rem">{{ r.name }}</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace" class="{{ 'up' if r.change_pct >= 0 else 'down' }}">{{ '+' if r.change_pct >= 0 else '' }}{{ '%.2f'|format(r.change_pct) }}%</td>
+            <td style="text-align:right" class="score-cell {{ 'score-hi' if r.combined_score >= 70 else 'score-md' if r.combined_score >= 50 else 'score-lo' }}">{{ '%.0f'|format(r.combined_score) }}</td>
           </tr>
-          
-          <tr><td class="ticker">META</td><td style="color:#b8b3a4;font-size:.82rem">Meta Platforms Inc.</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">+2.07%</td>
-            <td style="text-align:right" class="score-cell score-md">57</td>
-          </tr>
-          
-          <tr><td class="ticker">LLY</td><td style="color:#b8b3a4;font-size:.82rem">Eli Lilly and Company</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">+1.99%</td>
-            <td style="text-align:right" class="score-cell score-md">50</td>
-          </tr>
-          
-          <tr><td class="ticker">MA</td><td style="color:#b8b3a4;font-size:.82rem">Mastercard Inc.</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">+1.68%</td>
-            <td style="text-align:right" class="score-cell score-md">65</td>
-          </tr>
-          
-          <tr><td class="ticker">AAPL</td><td style="color:#b8b3a4;font-size:.82rem">Apple Inc.</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">+1.55%</td>
-            <td style="text-align:right" class="score-cell score-md">50</td>
-          </tr>
-          
-          <tr><td class="ticker">COST</td><td style="color:#b8b3a4;font-size:.82rem">Costco Wholesale Corp.</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">+1.47%</td>
-            <td style="text-align:right" class="score-cell score-md">62</td>
-          </tr>
-          
-          <tr><td class="ticker">AVGO</td><td style="color:#b8b3a4;font-size:.82rem">Broadcom Inc.</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">+1.25%</td>
-            <td style="text-align:right" class="score-cell score-lo">48</td>
-          </tr>
-          
-          <tr><td class="ticker">MSFT</td><td style="color:#b8b3a4;font-size:.82rem">Microsoft Corp.</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">+1.20%</td>
-            <td style="text-align:right" class="score-cell score-lo">40</td>
-          </tr>
-          
-          <tr><td class="ticker">PG</td><td style="color:#b8b3a4;font-size:.82rem">Procter &amp; Gamble Co.</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">+0.77%</td>
-            <td style="text-align:right" class="score-cell score-md">68</td>
-          </tr>
-          
-          <tr><td class="ticker">JPM</td><td style="color:#b8b3a4;font-size:.82rem">JPMorgan Chase &amp; Co.</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">+0.64%</td>
-            <td style="text-align:right" class="score-cell score-md">60</td>
-          </tr>
-          
-          <tr><td class="ticker">GOOG</td><td style="color:#b8b3a4;font-size:.82rem">Alphabet Inc. Class C</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">+0.53%</td>
-            <td style="text-align:right" class="score-cell score-md">58</td>
-          </tr>
-          
+          {% endfor %}
         </tbody>
       </table></div>
     </div>
@@ -2022,12 +433,12 @@ td{padding:.72rem .5rem;border-bottom:1px solid rgba(212,178,94,.08);color:var(-
       <div class="tbl-wrap"><table>
         <thead><tr><th>티커</th><th>이름</th><th style="text-align:right">배수</th><th style="text-align:right">점수</th></tr></thead>
         <tbody>
-          
-          <tr><td class="ticker">GOOGL</td><td style="color:#b8b3a4;font-size:.82rem">Alphabet Inc. Class A</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#ecd092;font-weight:600">1.5x</td>
-            <td style="text-align:right" class="score-cell score-lo">41</td>
+          {% for r in highlights.volume_surge %}
+          <tr><td class="ticker">{{ r.ticker }}</td><td style="color:#b8b3a4;font-size:.82rem">{{ r.name }}</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace;color:#ecd092;font-weight:600">{{ '%.1f'|format(r.volume_ratio) }}x</td>
+            <td style="text-align:right" class="score-cell {{ 'score-hi' if r.combined_score >= 70 else 'score-md' if r.combined_score >= 50 else 'score-lo' }}">{{ '%.0f'|format(r.combined_score) }}</td>
           </tr>
-          
+          {% endfor %}
         </tbody>
       </table></div>
     </div>
@@ -2037,82 +448,12 @@ td{padding:.72rem .5rem;border-bottom:1px solid rgba(212,178,94,.08);color:var(-
       <div class="tbl-wrap"><table>
         <thead><tr><th>티커</th><th>이름</th><th>골든X</th><th style="text-align:right">점수</th></tr></thead>
         <tbody>
-          
-          <tr><td class="ticker">PG</td><td style="color:#b8b3a4;font-size:.82rem">Procter &amp; Gamble Co.</td>
-            <td><span style="color:#5c5b54">·</span></td>
-            <td style="text-align:right" class="score-cell score-md">68</td>
+          {% for r in highlights.sma200_break %}
+          <tr><td class="ticker">{{ r.ticker }}</td><td style="color:#b8b3a4;font-size:.82rem">{{ r.name }}</td>
+            <td>{% if r.golden_cross %}<span style="color:#ecd092">⭐</span>{% else %}<span style="color:#5c5b54">·</span>{% endif %}</td>
+            <td style="text-align:right" class="score-cell {{ 'score-hi' if r.combined_score >= 70 else 'score-md' if r.combined_score >= 50 else 'score-lo' }}">{{ '%.0f'|format(r.combined_score) }}</td>
           </tr>
-          
-          <tr><td class="ticker">XOM</td><td style="color:#b8b3a4;font-size:.82rem">Exxon Mobil Corp.</td>
-            <td><span style="color:#5c5b54">·</span></td>
-            <td style="text-align:right" class="score-cell score-md">66</td>
-          </tr>
-          
-          <tr><td class="ticker">MA</td><td style="color:#b8b3a4;font-size:.82rem">Mastercard Inc.</td>
-            <td><span style="color:#5c5b54">·</span></td>
-            <td style="text-align:right" class="score-cell score-md">65</td>
-          </tr>
-          
-          <tr><td class="ticker">COST</td><td style="color:#b8b3a4;font-size:.82rem">Costco Wholesale Corp.</td>
-            <td><span style="color:#5c5b54">·</span></td>
-            <td style="text-align:right" class="score-cell score-md">62</td>
-          </tr>
-          
-          <tr><td class="ticker">AMZN</td><td style="color:#b8b3a4;font-size:.82rem">Amazon.com Inc.</td>
-            <td><span style="color:#5c5b54">·</span></td>
-            <td style="text-align:right" class="score-cell score-md">62</td>
-          </tr>
-          
-          <tr><td class="ticker">TSLA</td><td style="color:#b8b3a4;font-size:.82rem">Tesla Inc.</td>
-            <td><span style="color:#5c5b54">·</span></td>
-            <td style="text-align:right" class="score-cell score-md">60</td>
-          </tr>
-          
-          <tr><td class="ticker">JPM</td><td style="color:#b8b3a4;font-size:.82rem">JPMorgan Chase &amp; Co.</td>
-            <td><span style="color:#5c5b54">·</span></td>
-            <td style="text-align:right" class="score-cell score-md">60</td>
-          </tr>
-          
-          <tr><td class="ticker">GOOG</td><td style="color:#b8b3a4;font-size:.82rem">Alphabet Inc. Class C</td>
-            <td><span style="color:#5c5b54">·</span></td>
-            <td style="text-align:right" class="score-cell score-md">58</td>
-          </tr>
-          
-          <tr><td class="ticker">META</td><td style="color:#b8b3a4;font-size:.82rem">Meta Platforms Inc.</td>
-            <td><span style="color:#5c5b54">·</span></td>
-            <td style="text-align:right" class="score-cell score-md">57</td>
-          </tr>
-          
-          <tr><td class="ticker">NVDA</td><td style="color:#b8b3a4;font-size:.82rem">NVIDIA Corp.</td>
-            <td><span style="color:#5c5b54">·</span></td>
-            <td style="text-align:right" class="score-cell score-md">57</td>
-          </tr>
-          
-          <tr><td class="ticker">UNH</td><td style="color:#b8b3a4;font-size:.82rem">UnitedHealth Group Inc.</td>
-            <td><span style="color:#5c5b54">·</span></td>
-            <td style="text-align:right" class="score-cell score-md">57</td>
-          </tr>
-          
-          <tr><td class="ticker">AAPL</td><td style="color:#b8b3a4;font-size:.82rem">Apple Inc.</td>
-            <td><span style="color:#5c5b54">·</span></td>
-            <td style="text-align:right" class="score-cell score-md">50</td>
-          </tr>
-          
-          <tr><td class="ticker">LLY</td><td style="color:#b8b3a4;font-size:.82rem">Eli Lilly and Company</td>
-            <td><span style="color:#5c5b54">·</span></td>
-            <td style="text-align:right" class="score-cell score-md">50</td>
-          </tr>
-          
-          <tr><td class="ticker">BRK-B</td><td style="color:#b8b3a4;font-size:.82rem">Berkshire Hathaway Inc.</td>
-            <td><span style="color:#5c5b54">·</span></td>
-            <td style="text-align:right" class="score-cell score-lo">48</td>
-          </tr>
-          
-          <tr><td class="ticker">V</td><td style="color:#b8b3a4;font-size:.82rem">Visa Inc.</td>
-            <td><span style="color:#5c5b54">·</span></td>
-            <td style="text-align:right" class="score-cell score-lo">48</td>
-          </tr>
-          
+          {% endfor %}
         </tbody>
       </table></div>
     </div>
@@ -2122,42 +463,12 @@ td{padding:.72rem .5rem;border-bottom:1px solid rgba(212,178,94,.08);color:var(-
       <div class="tbl-wrap"><table>
         <thead><tr><th>티커</th><th>이름</th><th style="text-align:right">고점 대비</th><th style="text-align:right">점수</th></tr></thead>
         <tbody>
-          
-          <tr><td class="ticker">META</td><td style="color:#b8b3a4;font-size:.82rem">Meta Platforms Inc.</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">0.00%</td>
-            <td style="text-align:right" class="score-cell score-md">57</td>
+          {% for r in highlights.near_52w_high %}
+          <tr><td class="ticker">{{ r.ticker }}</td><td style="color:#b8b3a4;font-size:.82rem">{{ r.name }}</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace">{{ '%.2f'|format(r.pct_from_52w_high) }}%</td>
+            <td style="text-align:right" class="score-cell {{ 'score-hi' if r.combined_score >= 70 else 'score-md' if r.combined_score >= 50 else 'score-lo' }}">{{ '%.0f'|format(r.combined_score) }}</td>
           </tr>
-          
-          <tr><td class="ticker">JPM</td><td style="color:#b8b3a4;font-size:.82rem">JPMorgan Chase &amp; Co.</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">0.00%</td>
-            <td style="text-align:right" class="score-cell score-md">60</td>
-          </tr>
-          
-          <tr><td class="ticker">XOM</td><td style="color:#b8b3a4;font-size:.82rem">Exxon Mobil Corp.</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">-0.84%</td>
-            <td style="text-align:right" class="score-cell score-md">66</td>
-          </tr>
-          
-          <tr><td class="ticker">PG</td><td style="color:#b8b3a4;font-size:.82rem">Procter &amp; Gamble Co.</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">-1.62%</td>
-            <td style="text-align:right" class="score-cell score-md">68</td>
-          </tr>
-          
-          <tr><td class="ticker">MA</td><td style="color:#b8b3a4;font-size:.82rem">Mastercard Inc.</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">-1.66%</td>
-            <td style="text-align:right" class="score-cell score-md">65</td>
-          </tr>
-          
-          <tr><td class="ticker">AMZN</td><td style="color:#b8b3a4;font-size:.82rem">Amazon.com Inc.</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">-3.27%</td>
-            <td style="text-align:right" class="score-cell score-md">62</td>
-          </tr>
-          
-          <tr><td class="ticker">TSLA</td><td style="color:#b8b3a4;font-size:.82rem">Tesla Inc.</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">-4.85%</td>
-            <td style="text-align:right" class="score-cell score-md">60</td>
-          </tr>
-          
+          {% endfor %}
         </tbody>
       </table></div>
     </div>
@@ -2185,487 +496,34 @@ td{padding:.72rem .5rem;border-bottom:1px solid rgba(212,178,94,.08);color:var(-
           </tr>
         </thead>
         <tbody>
-          
+          {% for r in full %}
           <tr>
-            <td style="color:#7a7972">1</td>
-            <td class="ticker">PG</td>
-            <td style="color:#b8b3a4;font-size:.82rem;max-width:140px;overflow:hidden;text-overflow:ellipsis">Procter &amp; Gamble Co.</td>
-            <td style="color:#7a7972;font-size:.74rem">Consumer Staples</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">$588.12</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">+0.77%</td>
-            <td><span style="color:#4ade80">✓</span></td>
-            <td><span style="color:#5c5b54">·</span></td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">30.0%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">25.0</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">1.20</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">20.0</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">40</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">+20.0%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">+25.0%</td>
-            <td style="text-align:right" class="score-cell score-md">68</td>
-            <td style="font-size:.74rem;color:#ecd092">성장기 (Expansion)</td>
+            <td style="color:#7a7972">{{ loop.index }}</td>
+            <td class="ticker">{{ r.ticker }}</td>
+            <td style="color:#b8b3a4;font-size:.82rem;max-width:140px;overflow:hidden;text-overflow:ellipsis">{{ r.name }}</td>
+            <td style="color:#7a7972;font-size:.74rem">{{ r.sector }}</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace">{{ r.price_str }}</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace" class="{{ 'up' if r.change_pct >= 0 else 'down' }}">{{ '+' if r.change_pct >= 0 else '' }}{{ '%.2f'|format(r.change_pct) }}%</td>
+            <td>{% if r.above_sma200 %}<span style="color:#4ade80">✓</span>{% else %}<span style="color:#f06b6a">✗</span>{% endif %}</td>
+            <td>{% if r.golden_cross %}<span style="color:#ecd092">⭐</span>{% else %}<span style="color:#5c5b54">·</span>{% endif %}</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">{{ r.roe_str }}</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">{{ r.pe_str }}</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">{{ r.peg_str }}</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">{{ r.p_fcf_str }}</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">{{ r.debt_equity_str }}</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">{{ r.rev_growth_str }}</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">{{ r.eps_growth_str }}</td>
+            <td style="text-align:right" class="score-cell {{ 'score-hi' if r.combined_score >= 70 else 'score-md' if r.combined_score >= 50 else 'score-lo' }}">{{ '%.0f'|format(r.combined_score) }}</td>
+            <td style="font-size:.74rem;color:#ecd092">{{ r.damodaran }}</td>
             <td>
-              <span class="verdict v-watch">관심</span>
-              
+              {% if r.verdict == '관심' %}<span class="verdict v-watch">관심</span>
+              {% elif r.verdict == '보류' %}<span class="verdict v-hold">보류</span>
+              {% else %}<span class="verdict v-fail">미충족</span>{% endif %}
             </td>
           </tr>
-          
-          <tr>
-            <td style="color:#7a7972">2</td>
-            <td class="ticker">XOM</td>
-            <td style="color:#b8b3a4;font-size:.82rem;max-width:140px;overflow:hidden;text-overflow:ellipsis">Exxon Mobil Corp.</td>
-            <td style="color:#7a7972;font-size:.74rem">Energy</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">$312.36</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">+2.38%</td>
-            <td><span style="color:#4ade80">✓</span></td>
-            <td><span style="color:#5c5b54">·</span></td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">30.0%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">25.0</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">1.20</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">20.0</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">40</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">+20.0%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">+25.0%</td>
-            <td style="text-align:right" class="score-cell score-md">66</td>
-            <td style="font-size:.74rem;color:#ecd092">성장기 (Expansion)</td>
-            <td>
-              <span class="verdict v-watch">관심</span>
-              
-            </td>
-          </tr>
-          
-          <tr>
-            <td style="color:#7a7972">3</td>
-            <td class="ticker">MA</td>
-            <td style="color:#b8b3a4;font-size:.82rem;max-width:140px;overflow:hidden;text-overflow:ellipsis">Mastercard Inc.</td>
-            <td style="color:#7a7972;font-size:.74rem">Financials</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">$523.57</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">+1.68%</td>
-            <td><span style="color:#4ade80">✓</span></td>
-            <td><span style="color:#5c5b54">·</span></td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">30.0%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">25.0</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">1.20</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">20.0</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">40</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">+20.0%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">+25.0%</td>
-            <td style="text-align:right" class="score-cell score-md">65</td>
-            <td style="font-size:.74rem;color:#ecd092">성장기 (Expansion)</td>
-            <td>
-              <span class="verdict v-watch">관심</span>
-              
-            </td>
-          </tr>
-          
-          <tr>
-            <td style="color:#7a7972">4</td>
-            <td class="ticker">COST</td>
-            <td style="color:#b8b3a4;font-size:.82rem;max-width:140px;overflow:hidden;text-overflow:ellipsis">Costco Wholesale Corp.</td>
-            <td style="color:#7a7972;font-size:.74rem">Consumer Staples</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">$346.24</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">+1.47%</td>
-            <td><span style="color:#4ade80">✓</span></td>
-            <td><span style="color:#5c5b54">·</span></td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">30.0%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">25.0</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">1.20</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">20.0</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">40</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">+20.0%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">+25.0%</td>
-            <td style="text-align:right" class="score-cell score-md">62</td>
-            <td style="font-size:.74rem;color:#ecd092">성장기 (Expansion)</td>
-            <td>
-              <span class="verdict v-watch">관심</span>
-              
-            </td>
-          </tr>
-          
-          <tr>
-            <td style="color:#7a7972">5</td>
-            <td class="ticker">AMZN</td>
-            <td style="color:#b8b3a4;font-size:.82rem;max-width:140px;overflow:hidden;text-overflow:ellipsis">Amazon.com Inc.</td>
-            <td style="color:#7a7972;font-size:.74rem">Consumer Discretiona</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">$264.19</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="down">-1.45%</td>
-            <td><span style="color:#4ade80">✓</span></td>
-            <td><span style="color:#5c5b54">·</span></td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">30.0%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">25.0</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">1.20</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">20.0</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">40</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">+20.0%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">+25.0%</td>
-            <td style="text-align:right" class="score-cell score-md">62</td>
-            <td style="font-size:.74rem;color:#ecd092">성장기 (Expansion)</td>
-            <td>
-              <span class="verdict v-watch">관심</span>
-              
-            </td>
-          </tr>
-          
-          <tr>
-            <td style="color:#7a7972">6</td>
-            <td class="ticker">TSLA</td>
-            <td style="color:#b8b3a4;font-size:.82rem;max-width:140px;overflow:hidden;text-overflow:ellipsis">Tesla Inc.</td>
-            <td style="color:#7a7972;font-size:.74rem">Consumer Discretiona</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">$333.48</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="down">-0.69%</td>
-            <td><span style="color:#4ade80">✓</span></td>
-            <td><span style="color:#5c5b54">·</span></td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">30.0%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">25.0</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">1.20</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">20.0</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">40</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">+20.0%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">+25.0%</td>
-            <td style="text-align:right" class="score-cell score-md">60</td>
-            <td style="font-size:.74rem;color:#ecd092">성장기 (Expansion)</td>
-            <td>
-              <span class="verdict v-watch">관심</span>
-              
-            </td>
-          </tr>
-          
-          <tr>
-            <td style="color:#7a7972">7</td>
-            <td class="ticker">JPM</td>
-            <td style="color:#b8b3a4;font-size:.82rem;max-width:140px;overflow:hidden;text-overflow:ellipsis">JPMorgan Chase &amp; Co.</td>
-            <td style="color:#7a7972;font-size:.74rem">Financials</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">$655.02</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">+0.64%</td>
-            <td><span style="color:#4ade80">✓</span></td>
-            <td><span style="color:#5c5b54">·</span></td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">30.0%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">25.0</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">1.20</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">20.0</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">40</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">+20.0%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">+25.0%</td>
-            <td style="text-align:right" class="score-cell score-md">60</td>
-            <td style="font-size:.74rem;color:#ecd092">성장기 (Expansion)</td>
-            <td>
-              <span class="verdict v-watch">관심</span>
-              
-            </td>
-          </tr>
-          
-          <tr>
-            <td style="color:#7a7972">8</td>
-            <td class="ticker">GOOG</td>
-            <td style="color:#b8b3a4;font-size:.82rem;max-width:140px;overflow:hidden;text-overflow:ellipsis">Alphabet Inc. Class C</td>
-            <td style="color:#7a7972;font-size:.74rem">Communication Servic</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">$142.08</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">+0.53%</td>
-            <td><span style="color:#4ade80">✓</span></td>
-            <td><span style="color:#5c5b54">·</span></td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">30.0%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">25.0</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">1.20</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">20.0</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">40</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">+20.0%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">+25.0%</td>
-            <td style="text-align:right" class="score-cell score-md">58</td>
-            <td style="font-size:.74rem;color:#ecd092">성장기 (Expansion)</td>
-            <td>
-              <span class="verdict v-watch">관심</span>
-              
-            </td>
-          </tr>
-          
-          <tr>
-            <td style="color:#7a7972">9</td>
-            <td class="ticker">META</td>
-            <td style="color:#b8b3a4;font-size:.82rem;max-width:140px;overflow:hidden;text-overflow:ellipsis">Meta Platforms Inc.</td>
-            <td style="color:#7a7972;font-size:.74rem">Communication Servic</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">$78.42</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">+2.07%</td>
-            <td><span style="color:#4ade80">✓</span></td>
-            <td><span style="color:#5c5b54">·</span></td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">30.0%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">25.0</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">1.20</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">20.0</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">40</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">+20.0%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">+25.0%</td>
-            <td style="text-align:right" class="score-cell score-md">57</td>
-            <td style="font-size:.74rem;color:#ecd092">성장기 (Expansion)</td>
-            <td>
-              <span class="verdict v-watch">관심</span>
-              
-            </td>
-          </tr>
-          
-          <tr>
-            <td style="color:#7a7972">10</td>
-            <td class="ticker">NVDA</td>
-            <td style="color:#b8b3a4;font-size:.82rem;max-width:140px;overflow:hidden;text-overflow:ellipsis">NVIDIA Corp.</td>
-            <td style="color:#7a7972;font-size:.74rem">Technology</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">$563.80</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="down">-2.79%</td>
-            <td><span style="color:#4ade80">✓</span></td>
-            <td><span style="color:#5c5b54">·</span></td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">30.0%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">25.0</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">1.20</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">20.0</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">40</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">+20.0%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">+25.0%</td>
-            <td style="text-align:right" class="score-cell score-md">57</td>
-            <td style="font-size:.74rem;color:#ecd092">성장기 (Expansion)</td>
-            <td>
-              <span class="verdict v-watch">관심</span>
-              
-            </td>
-          </tr>
-          
-          <tr>
-            <td style="color:#7a7972">11</td>
-            <td class="ticker">UNH</td>
-            <td style="color:#b8b3a4;font-size:.82rem;max-width:140px;overflow:hidden;text-overflow:ellipsis">UnitedHealth Group Inc.</td>
-            <td style="color:#7a7972;font-size:.74rem">Health Care</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">$295.59</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="down">-0.43%</td>
-            <td><span style="color:#4ade80">✓</span></td>
-            <td><span style="color:#5c5b54">·</span></td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">30.0%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">25.0</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">1.20</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">20.0</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">40</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">+20.0%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">+25.0%</td>
-            <td style="text-align:right" class="score-cell score-md">57</td>
-            <td style="font-size:.74rem;color:#ecd092">성장기 (Expansion)</td>
-            <td>
-              <span class="verdict v-watch">관심</span>
-              
-            </td>
-          </tr>
-          
-          <tr>
-            <td style="color:#7a7972">12</td>
-            <td class="ticker">AAPL</td>
-            <td style="color:#b8b3a4;font-size:.82rem;max-width:140px;overflow:hidden;text-overflow:ellipsis">Apple Inc.</td>
-            <td style="color:#7a7972;font-size:.74rem">Technology</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">$81.62</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">+1.55%</td>
-            <td><span style="color:#4ade80">✓</span></td>
-            <td><span style="color:#5c5b54">·</span></td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">30.0%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">25.0</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">1.20</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">20.0</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">40</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">+20.0%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">+25.0%</td>
-            <td style="text-align:right" class="score-cell score-md">50</td>
-            <td style="font-size:.74rem;color:#ecd092">성장기 (Expansion)</td>
-            <td>
-              <span class="verdict v-watch">관심</span>
-              
-            </td>
-          </tr>
-          
-          <tr>
-            <td style="color:#7a7972">13</td>
-            <td class="ticker">LLY</td>
-            <td style="color:#b8b3a4;font-size:.82rem;max-width:140px;overflow:hidden;text-overflow:ellipsis">Eli Lilly and Company</td>
-            <td style="color:#7a7972;font-size:.74rem">Health Care</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">$551.20</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">+1.99%</td>
-            <td><span style="color:#4ade80">✓</span></td>
-            <td><span style="color:#5c5b54">·</span></td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">30.0%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">25.0</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">1.20</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">20.0</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">40</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">+20.0%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">+25.0%</td>
-            <td style="text-align:right" class="score-cell score-md">50</td>
-            <td style="font-size:.74rem;color:#ecd092">성장기 (Expansion)</td>
-            <td>
-              <span class="verdict v-watch">관심</span>
-              
-            </td>
-          </tr>
-          
-          <tr>
-            <td style="color:#7a7972">14</td>
-            <td class="ticker">BRK-B</td>
-            <td style="color:#b8b3a4;font-size:.82rem;max-width:140px;overflow:hidden;text-overflow:ellipsis">Berkshire Hathaway Inc.</td>
-            <td style="color:#7a7972;font-size:.74rem">Financials</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">$473.05</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="down">-2.72%</td>
-            <td><span style="color:#4ade80">✓</span></td>
-            <td><span style="color:#5c5b54">·</span></td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">30.0%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">25.0</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">1.20</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">20.0</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">40</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">+20.0%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">+25.0%</td>
-            <td style="text-align:right" class="score-cell score-lo">48</td>
-            <td style="font-size:.74rem;color:#ecd092">성장기 (Expansion)</td>
-            <td>
-              <span class="verdict v-hold">보류</span>
-              
-            </td>
-          </tr>
-          
-          <tr>
-            <td style="color:#7a7972">15</td>
-            <td class="ticker">V</td>
-            <td style="color:#b8b3a4;font-size:.82rem;max-width:140px;overflow:hidden;text-overflow:ellipsis">Visa Inc.</td>
-            <td style="color:#7a7972;font-size:.74rem">Financials</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">$381.70</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="down">-3.27%</td>
-            <td><span style="color:#4ade80">✓</span></td>
-            <td><span style="color:#5c5b54">·</span></td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">30.0%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">25.0</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">1.20</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">20.0</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">40</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">+20.0%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">+25.0%</td>
-            <td style="text-align:right" class="score-cell score-lo">48</td>
-            <td style="font-size:.74rem;color:#ecd092">성장기 (Expansion)</td>
-            <td>
-              <span class="verdict v-hold">보류</span>
-              
-            </td>
-          </tr>
-          
-          <tr>
-            <td style="color:#7a7972">16</td>
-            <td class="ticker">AVGO</td>
-            <td style="color:#b8b3a4;font-size:.82rem;max-width:140px;overflow:hidden;text-overflow:ellipsis">Broadcom Inc.</td>
-            <td style="color:#7a7972;font-size:.74rem">Technology</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">$473.76</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">+1.25%</td>
-            <td><span style="color:#f06b6a">✗</span></td>
-            <td><span style="color:#5c5b54">·</span></td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">30.0%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">25.0</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">1.20</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">20.0</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">40</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">+20.0%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">+25.0%</td>
-            <td style="text-align:right" class="score-cell score-lo">48</td>
-            <td style="font-size:.74rem;color:#ecd092">성장기 (Expansion)</td>
-            <td>
-              <span class="verdict v-hold">보류</span>
-              
-            </td>
-          </tr>
-          
-          <tr>
-            <td style="color:#7a7972">17</td>
-            <td class="ticker">GOOGL</td>
-            <td style="color:#b8b3a4;font-size:.82rem;max-width:140px;overflow:hidden;text-overflow:ellipsis">Alphabet Inc. Class A</td>
-            <td style="color:#7a7972;font-size:.74rem">Communication Servic</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">$359.64</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="down">-3.52%</td>
-            <td><span style="color:#f06b6a">✗</span></td>
-            <td><span style="color:#5c5b54">·</span></td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">30.0%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">25.0</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">1.20</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">20.0</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">40</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">+20.0%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">+25.0%</td>
-            <td style="text-align:right" class="score-cell score-lo">41</td>
-            <td style="font-size:.74rem;color:#ecd092">성장기 (Expansion)</td>
-            <td>
-              <span class="verdict v-hold">보류</span>
-              
-            </td>
-          </tr>
-          
-          <tr>
-            <td style="color:#7a7972">18</td>
-            <td class="ticker">MSFT</td>
-            <td style="color:#b8b3a4;font-size:.82rem;max-width:140px;overflow:hidden;text-overflow:ellipsis">Microsoft Corp.</td>
-            <td style="color:#7a7972;font-size:.74rem">Technology</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">$211.24</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">+1.20%</td>
-            <td><span style="color:#f06b6a">✗</span></td>
-            <td><span style="color:#5c5b54">·</span></td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">30.0%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">25.0</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">1.20</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">20.0</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">40</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">+20.0%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">+25.0%</td>
-            <td style="text-align:right" class="score-cell score-lo">40</td>
-            <td style="font-size:.74rem;color:#ecd092">성장기 (Expansion)</td>
-            <td>
-              <span class="verdict v-hold">보류</span>
-              
-            </td>
-          </tr>
-          
-          <tr>
-            <td style="color:#7a7972">19</td>
-            <td class="ticker">WMT</td>
-            <td style="color:#b8b3a4;font-size:.82rem;max-width:140px;overflow:hidden;text-overflow:ellipsis">Walmart Inc.</td>
-            <td style="color:#7a7972;font-size:.74rem">Consumer Staples</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">$40.13</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="down">-0.41%</td>
-            <td><span style="color:#f06b6a">✗</span></td>
-            <td><span style="color:#5c5b54">·</span></td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">30.0%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">25.0</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">1.20</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">20.0</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">40</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">+20.0%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">+25.0%</td>
-            <td style="text-align:right" class="score-cell score-lo">38</td>
-            <td style="font-size:.74rem;color:#ecd092">성장기 (Expansion)</td>
-            <td>
-              <span class="verdict v-hold">보류</span>
-              
-            </td>
-          </tr>
-          
-          <tr>
-            <td style="color:#7a7972">20</td>
-            <td class="ticker">JNJ</td>
-            <td style="color:#b8b3a4;font-size:.82rem;max-width:140px;overflow:hidden;text-overflow:ellipsis">Johnson &amp; Johnson</td>
-            <td style="color:#7a7972;font-size:.74rem">Health Care</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">$300.24</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="down">-0.48%</td>
-            <td><span style="color:#f06b6a">✗</span></td>
-            <td><span style="color:#5c5b54">·</span></td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">30.0%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">25.0</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">1.20</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">20.0</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">40</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">+20.0%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#b8b3a4">+25.0%</td>
-            <td style="text-align:right" class="score-cell score-lo">38</td>
-            <td style="font-size:.74rem;color:#ecd092">성장기 (Expansion)</td>
-            <td>
-              <span class="verdict v-hold">보류</span>
-              
-            </td>
-          </tr>
-          
+          {% else %}
+          <tr><td colspan="18" style="text-align:center;color:#7a7972;padding:1.5rem">데이터 없음</td></tr>
+          {% endfor %}
         </tbody>
       </table>
     </div>
@@ -2701,287 +559,23 @@ td{padding:.72rem .5rem;border-bottom:1px solid rgba(212,178,94,.08);color:var(-
           </tr>
         </thead>
         <tbody>
-          
+          {% for r in full %}
           <tr>
-            <td style="color:#7a7972">1</td>
-            <td class="ticker">PG</td>
-            <td style="color:#b8b3a4;font-size:.84rem;max-width:160px;overflow:hidden;text-overflow:ellipsis">Procter &amp; Gamble Co.</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">-21.9%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#f06b6a">-21.9%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">26.2%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">1.37</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">—</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">—</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#f06b6a">-2.7%</td>
-            <td style="text-align:right" class="score-cell score-hi">22</td>
+            <td style="color:#7a7972">{{ loop.index }}</td>
+            <td class="ticker">{{ r.ticker }}</td>
+            <td style="color:#b8b3a4;font-size:.84rem;max-width:160px;overflow:hidden;text-overflow:ellipsis">{{ r.name }}</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace" class="{{ 'up' if (r.alpha or 0) >= 0 else 'down' }}">{{ r.mdd_str if r.mdd is none else '%+.1f%%'|format((r.mdd or 0) + (r.beta or 0) * 0) }}</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace;color:#f06b6a">{{ r.mdd_str }}</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace">{{ '%.1f%%'|format(r.volatility_20d) }}</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace" class="{{ 'up' if (r.sharpe or 0) > 1 else '' }}">{{ r.sharpe_str }}</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace">{{ r.beta_str }}</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace" class="{{ 'up' if (r.alpha or 0) >= 0 else 'down' }}">{{ r.alpha_str }}</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace;color:#f06b6a">{{ r.var_95_str }}</td>
+            <td style="text-align:right" class="score-cell {{ 'score-hi' if (r.risk_score or 100) <= 30 else 'score-md' if (r.risk_score or 100) <= 60 else 'score-lo' }}">{{ r.risk_score_str }}</td>
           </tr>
-          
-          <tr>
-            <td style="color:#7a7972">2</td>
-            <td class="ticker">XOM</td>
-            <td style="color:#b8b3a4;font-size:.84rem;max-width:160px;overflow:hidden;text-overflow:ellipsis">Exxon Mobil Corp.</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">-17.5%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#f06b6a">-17.5%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">23.5%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="">0.66</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">—</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">—</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#f06b6a">-3.2%</td>
-            <td style="text-align:right" class="score-cell score-hi">21</td>
-          </tr>
-          
-          <tr>
-            <td style="color:#7a7972">3</td>
-            <td class="ticker">MA</td>
-            <td style="color:#b8b3a4;font-size:.84rem;max-width:160px;overflow:hidden;text-overflow:ellipsis">Mastercard Inc.</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">-13.8%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#f06b6a">-13.8%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">36.8%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">3.08</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">—</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">—</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#f06b6a">-2.7%</td>
-            <td style="text-align:right" class="score-cell score-hi">16</td>
-          </tr>
-          
-          <tr>
-            <td style="color:#7a7972">4</td>
-            <td class="ticker">COST</td>
-            <td style="color:#b8b3a4;font-size:.84rem;max-width:160px;overflow:hidden;text-overflow:ellipsis">Costco Wholesale Corp.</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">-48.8%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#f06b6a">-48.8%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">19.4%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="">-1.28</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">—</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">—</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#f06b6a">-2.8%</td>
-            <td style="text-align:right" class="score-cell score-md">49</td>
-          </tr>
-          
-          <tr>
-            <td style="color:#7a7972">5</td>
-            <td class="ticker">AMZN</td>
-            <td style="color:#b8b3a4;font-size:.84rem;max-width:160px;overflow:hidden;text-overflow:ellipsis">Amazon.com Inc.</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">-20.7%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#f06b6a">-20.7%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">25.9%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">2.47</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">—</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">—</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#f06b6a">-2.6%</td>
-            <td style="text-align:right" class="score-cell score-hi">23</td>
-          </tr>
-          
-          <tr>
-            <td style="color:#7a7972">6</td>
-            <td class="ticker">TSLA</td>
-            <td style="color:#b8b3a4;font-size:.84rem;max-width:160px;overflow:hidden;text-overflow:ellipsis">Tesla Inc.</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">-13.3%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#f06b6a">-13.3%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">28.7%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">2.01</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">—</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">—</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#f06b6a">-2.4%</td>
-            <td style="text-align:right" class="score-cell score-hi">16</td>
-          </tr>
-          
-          <tr>
-            <td style="color:#7a7972">7</td>
-            <td class="ticker">JPM</td>
-            <td style="color:#b8b3a4;font-size:.84rem;max-width:160px;overflow:hidden;text-overflow:ellipsis">JPMorgan Chase &amp; Co.</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">-10.9%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#f06b6a">-10.9%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">37.1%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">2.70</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">—</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">—</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#f06b6a">-2.6%</td>
-            <td style="text-align:right" class="score-cell score-hi">12</td>
-          </tr>
-          
-          <tr>
-            <td style="color:#7a7972">8</td>
-            <td class="ticker">GOOG</td>
-            <td style="color:#b8b3a4;font-size:.84rem;max-width:160px;overflow:hidden;text-overflow:ellipsis">Alphabet Inc. Class C</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">-21.3%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#f06b6a">-21.3%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">31.3%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">1.86</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">—</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">—</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#f06b6a">-3.1%</td>
-            <td style="text-align:right" class="score-cell score-hi">22</td>
-          </tr>
-          
-          <tr>
-            <td style="color:#7a7972">9</td>
-            <td class="ticker">META</td>
-            <td style="color:#b8b3a4;font-size:.84rem;max-width:160px;overflow:hidden;text-overflow:ellipsis">Meta Platforms Inc.</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">-14.5%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#f06b6a">-14.5%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">27.5%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">2.04</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">—</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">—</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#f06b6a">-2.8%</td>
-            <td style="text-align:right" class="score-cell score-hi">17</td>
-          </tr>
-          
-          <tr>
-            <td style="color:#7a7972">10</td>
-            <td class="ticker">NVDA</td>
-            <td style="color:#b8b3a4;font-size:.84rem;max-width:160px;overflow:hidden;text-overflow:ellipsis">NVIDIA Corp.</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">-17.1%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#f06b6a">-17.1%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">26.8%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">1.51</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">—</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">—</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#f06b6a">-3.0%</td>
-            <td style="text-align:right" class="score-cell score-hi">20</td>
-          </tr>
-          
-          <tr>
-            <td style="color:#7a7972">11</td>
-            <td class="ticker">UNH</td>
-            <td style="color:#b8b3a4;font-size:.84rem;max-width:160px;overflow:hidden;text-overflow:ellipsis">UnitedHealth Group Inc.</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">-16.6%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#f06b6a">-16.6%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">14.4%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">2.91</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">—</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">—</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#f06b6a">-2.3%</td>
-            <td style="text-align:right" class="score-cell score-hi">18</td>
-          </tr>
-          
-          <tr>
-            <td style="color:#7a7972">12</td>
-            <td class="ticker">AAPL</td>
-            <td style="color:#b8b3a4;font-size:.84rem;max-width:160px;overflow:hidden;text-overflow:ellipsis">Apple Inc.</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">-19.5%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#f06b6a">-19.5%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">30.7%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="">0.02</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">—</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">—</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#f06b6a">-3.2%</td>
-            <td style="text-align:right" class="score-cell score-hi">25</td>
-          </tr>
-          
-          <tr>
-            <td style="color:#7a7972">13</td>
-            <td class="ticker">LLY</td>
-            <td style="color:#b8b3a4;font-size:.84rem;max-width:160px;overflow:hidden;text-overflow:ellipsis">Eli Lilly and Company</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">-24.8%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#f06b6a">-24.8%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">28.1%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">2.42</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">—</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">—</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#f06b6a">-2.9%</td>
-            <td style="text-align:right" class="score-cell score-hi">28</td>
-          </tr>
-          
-          <tr>
-            <td style="color:#7a7972">14</td>
-            <td class="ticker">BRK-B</td>
-            <td style="color:#b8b3a4;font-size:.84rem;max-width:160px;overflow:hidden;text-overflow:ellipsis">Berkshire Hathaway Inc.</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">-17.6%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#f06b6a">-17.6%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">21.5%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">2.46</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">—</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">—</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#f06b6a">-2.5%</td>
-            <td style="text-align:right" class="score-cell score-hi">17</td>
-          </tr>
-          
-          <tr>
-            <td style="color:#7a7972">15</td>
-            <td class="ticker">V</td>
-            <td style="color:#b8b3a4;font-size:.84rem;max-width:160px;overflow:hidden;text-overflow:ellipsis">Visa Inc.</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">-19.3%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#f06b6a">-19.3%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">31.8%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">1.80</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">—</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">—</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#f06b6a">-2.7%</td>
-            <td style="text-align:right" class="score-cell score-hi">21</td>
-          </tr>
-          
-          <tr>
-            <td style="color:#7a7972">16</td>
-            <td class="ticker">AVGO</td>
-            <td style="color:#b8b3a4;font-size:.84rem;max-width:160px;overflow:hidden;text-overflow:ellipsis">Broadcom Inc.</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">-37.3%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#f06b6a">-37.3%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">33.5%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="">0.46</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">—</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">—</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#f06b6a">-2.9%</td>
-            <td style="text-align:right" class="score-cell score-md">40</td>
-          </tr>
-          
-          <tr>
-            <td style="color:#7a7972">17</td>
-            <td class="ticker">GOOGL</td>
-            <td style="color:#b8b3a4;font-size:.84rem;max-width:160px;overflow:hidden;text-overflow:ellipsis">Alphabet Inc. Class A</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">-24.1%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#f06b6a">-24.1%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">30.9%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">1.44</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">—</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">—</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#f06b6a">-2.6%</td>
-            <td style="text-align:right" class="score-cell score-hi">25</td>
-          </tr>
-          
-          <tr>
-            <td style="color:#7a7972">18</td>
-            <td class="ticker">MSFT</td>
-            <td style="color:#b8b3a4;font-size:.84rem;max-width:160px;overflow:hidden;text-overflow:ellipsis">Microsoft Corp.</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">-31.0%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#f06b6a">-31.0%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">25.3%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="">0.88</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">—</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">—</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#f06b6a">-3.2%</td>
-            <td style="text-align:right" class="score-cell score-md">37</td>
-          </tr>
-          
-          <tr>
-            <td style="color:#7a7972">19</td>
-            <td class="ticker">WMT</td>
-            <td style="color:#b8b3a4;font-size:.84rem;max-width:160px;overflow:hidden;text-overflow:ellipsis">Walmart Inc.</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">-32.9%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#f06b6a">-32.9%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">23.6%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="">-0.80</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">—</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">—</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#f06b6a">-2.7%</td>
-            <td style="text-align:right" class="score-cell score-md">32</td>
-          </tr>
-          
-          <tr>
-            <td style="color:#7a7972">20</td>
-            <td class="ticker">JNJ</td>
-            <td style="color:#b8b3a4;font-size:.84rem;max-width:160px;overflow:hidden;text-overflow:ellipsis">Johnson &amp; Johnson</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">-32.4%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#f06b6a">-32.4%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">20.7%</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="">-0.51</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace">—</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace" class="up">—</td>
-            <td style="text-align:right;font-family:'DM Mono',monospace;color:#f06b6a">-3.0%</td>
-            <td style="text-align:right" class="score-cell score-md">35</td>
-          </tr>
-          
+          {% else %}
+          <tr><td colspan="11" style="text-align:center;color:#7a7972;padding:1.5rem">데이터 없음</td></tr>
+          {% endfor %}
         </tbody>
       </table>
     </div>
@@ -3000,14 +594,128 @@ td{padding:.72rem .5rem;border-bottom:1px solid rgba(212,178,94,.08);color:var(-
   <div class="sec-title">간이 <em>백테스트</em></div>
   <div class="sec-sub">전략: 매 거래일 점수 상위 10개 동일가중 보유, 주 1회 리밸런싱. 기간: 지난 1년. 비교: SPY.</div>
 
-  
+  {% if backtest and backtest.dates %}
+  <div class="bt-summary-grid">
+    <div class="bt-stat">
+      <div class="bt-stat-label">전략 누적수익</div>
+      <div class="bt-stat-val {{ 'up' if backtest.summary.final_strategy >= 0 else 'down' }}">{{ '%+.1f%%'|format(backtest.summary.final_strategy) }}</div>
+    </div>
+    <div class="bt-stat">
+      <div class="bt-stat-label">SPY 누적수익</div>
+      <div class="bt-stat-val {{ 'up' if backtest.summary.final_spy >= 0 else 'down' }}">{{ '%+.1f%%'|format(backtest.summary.final_spy) }}</div>
+    </div>
+    <div class="bt-stat">
+      <div class="bt-stat-label">알파 (전략 - SPY)</div>
+      <div class="bt-stat-val {{ 'up' if backtest.summary.alpha >= 0 else 'down' }}">{{ '%+.1f%%'|format(backtest.summary.alpha) }}</div>
+    </div>
+    <div class="bt-stat">
+      <div class="bt-stat-label">샤프 비율</div>
+      <div class="bt-stat-val">{{ '%.2f'|format(backtest.summary.sharpe) }}</div>
+    </div>
+    <div class="bt-stat">
+      <div class="bt-stat-label">최대 낙폭(MDD)</div>
+      <div class="bt-stat-val down">{{ '%.1f%%'|format(backtest.summary.mdd) }}</div>
+    </div>
+    <div class="bt-stat">
+      <div class="bt-stat-label">거래일 수</div>
+      <div class="bt-stat-val">{{ backtest.summary.trading_days }}</div>
+    </div>
+  </div>
+
+  <div class="bt-chart">
+    <div class="bt-chart-title">📈 누적 수익률 (전략 vs SPY)</div>
+    <canvas id="btChart" style="width:100%;height:340px"></canvas>
+  </div>
+
+  <script>
+  (function(){
+    const dates = {{ backtest.dates | tojson }};
+    const strat = {{ backtest.strategy_cum | tojson }};
+    const spy = {{ backtest.spy_cum | tojson }};
+
+    const canvas = document.getElementById('btChart');
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width = canvas.offsetWidth;
+    const H = canvas.height = 340;
+    const pad = {top: 20, right: 20, bottom: 30, left: 50};
+    const cw = W - pad.left - pad.right;
+    const ch = H - pad.top - pad.bottom;
+
+    const allVals = [...strat, ...spy];
+    const minV = Math.min(...allVals);
+    const maxV = Math.max(...allVals);
+    const range = maxV - minV || 1;
+
+    function x(i){ return pad.left + (i / (dates.length-1)) * cw; }
+    function y(v){ return pad.top + ch - ((v - minV) / range) * ch; }
+
+    // grid
+    ctx.strokeStyle = 'rgba(212,178,94,0.12)';
+    ctx.lineWidth = 1;
+    for(let i=0;i<=4;i++){
+      const yy = pad.top + (ch * i / 4);
+      ctx.beginPath(); ctx.moveTo(pad.left, yy); ctx.lineTo(W-pad.right, yy); ctx.stroke();
+      const val = maxV - range * i / 4;
+      ctx.fillStyle = '#b8b3a4';
+      ctx.font = '11px DM Mono';
+      ctx.textAlign = 'right';
+      ctx.fillText(val.toFixed(0)+'%', pad.left-6, yy+3);
+    }
+
+    // zero line
+    if(minV < 0 && maxV > 0){
+      const y0 = y(0);
+      ctx.strokeStyle = 'rgba(184,179,164,0.4)';
+      ctx.setLineDash([4,4]);
+      ctx.beginPath(); ctx.moveTo(pad.left, y0); ctx.lineTo(W-pad.right, y0); ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    // SPY line
+    ctx.strokeStyle = '#7ab0ff';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    spy.forEach((v,i)=>{ if(i===0) ctx.moveTo(x(i), y(v)); else ctx.lineTo(x(i), y(v)); });
+    ctx.stroke();
+
+    // Strategy line
+    ctx.strokeStyle = '#ecd092';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    strat.forEach((v,i)=>{ if(i===0) ctx.moveTo(x(i), y(v)); else ctx.lineTo(x(i), y(v)); });
+    ctx.stroke();
+
+    // 범례
+    ctx.font = '12px Pretendard, sans-serif';
+    ctx.fillStyle = '#ecd092';
+    ctx.textAlign = 'left';
+    ctx.fillText('● 전략 (TOP10)', pad.left+10, pad.top+15);
+    ctx.fillStyle = '#7ab0ff';
+    ctx.fillText('● SPY', pad.left+130, pad.top+15);
+
+    // x축
+    ctx.fillStyle = '#7a7972';
+    ctx.font = '10px DM Mono';
+    ctx.textAlign = 'center';
+    [0, Math.floor(dates.length/2), dates.length-1].forEach(i=>{
+      if(dates[i]) ctx.fillText(dates[i], x(i), H-10);
+    });
+  })();
+  </script>
+
+  <div style="padding:.9rem 1.1rem;background:var(--bg3);border-left:3px solid var(--gold);font-size:.88rem;color:var(--gray);line-height:1.75;border-radius:2px">
+    ※ 백테스트는 <strong style="color:#ecd092">주 1회(월요일) 갱신</strong>됩니다. 캐시 활용으로 비용/시간 절감.<br>
+    ※ 과거 성과는 미래 수익을 보장하지 않습니다. <strong style="color:#ecd092">거래비용·세금 미반영</strong>.<br>
+    ※ 단순 점수 기반 전략 검증용이며, 실제 투자 권유가 아닙니다.
+  </div>
+  {% else %}
   <div class="card" style="text-align:center;padding:3rem 1rem">
     <div style="color:var(--gray);font-size:1.05rem;line-height:1.7">
       백테스트 데이터를 준비 중입니다.<br>
       첫 빌드에서 데이터 수집이 완료되면 표시됩니다.
     </div>
   </div>
-  
+  {% endif %}
 </div>
 
 <!-- 자산 배분 -->
@@ -3018,11 +726,11 @@ td{padding:.72rem .5rem;border-bottom:1px solid rgba(212,178,94,.08);color:var(-
 
   <div class="card">
     <div class="alloc-row">
-      <div class="alloc-seg alloc-stock" style="width:35%">주식 35%</div>
-      <div class="alloc-seg alloc-gold" style="width:25%">금 25%</div>
-      <div class="alloc-seg alloc-cash" style="width:40%">현금/채권 40%</div>
+      <div class="alloc-seg alloc-stock" style="width:{{ allocation.stock }}%">주식 {{ allocation.stock }}%</div>
+      <div class="alloc-seg alloc-gold" style="width:{{ allocation.gold }}%">금 {{ allocation.gold }}%</div>
+      <div class="alloc-seg alloc-cash" style="width:{{ allocation.cash }}%">현금/채권 {{ allocation.cash }}%</div>
     </div>
-    <div class="mkt-interpret">고변동성 — 현금 비중 우선</div>
+    <div class="mkt-interpret">{{ allocation.note }}</div>
   </div>
 </div>
 
@@ -3031,20 +739,7 @@ td{padding:.72rem .5rem;border-bottom:1px solid rgba(212,178,94,.08);color:var(-
   <div class="sec-label">발송용</div>
   <div class="sec-title">카카오톡 <em>요약</em></div>
   <div class="sec-sub">500자 내외 요약. 복사해서 카카오톡 채널/그룹에 발송하세요.</div>
-  <div class="text-box" id="kakao-text">📈 에스아이스토리 리포트 (2026년 05월 27일)
-
-• S&amp;P 500: 216.82 (-0.17%)
-• 코스피: 203.34 (+1.79%)
-• VIX: 519.36
-
-🇺🇸 미국 관심종목 TOP 3
-  1. PG (Procter &amp; Gamble Co.) — 68점
-  2. XOM (Exxon Mobil Corp.) — 66점
-  3. MA (Mastercard Inc.) — 65점
-
-💰 자산배분: 주식 35% / 금 25% / 현금 40%
-
-※ 본 정보는 투자 참고용입니다.</div>
+  <div class="text-box" id="kakao-text">{{ kakao }}</div>
   <button class="copy-btn" onclick="copyText('kakao-text')">📋 복사하기</button>
 </div>
 
@@ -3053,46 +748,7 @@ td{padding:.72rem .5rem;border-bottom:1px solid rgba(212,178,94,.08);color:var(-
   <div class="sec-label">발송용</div>
   <div class="sec-title">블로그 <em>업로드용</em></div>
   <div class="sec-sub">마크다운 포맷. 블로그(티스토리/브런치/노션 등)에 그대로 붙여넣을 수 있습니다.</div>
-  <div class="text-box" id="blog-text"># 2026년 05월 27일 시황 리포트
-
-## 오늘의 시장
-
-VIX 519.4 — 변동성 과열. 리스크 관리 우선. 코스피 +1.79% 상승.
-
-| 지수 | 종가 | 등락률 |
-|---|---|---|
-| S&amp;P 500 | 216.82 | -0.17% |
-| 코스피 | 203.34 | +1.79% |
-
-## 미국 관심 종목 TOP 3
-
-**1. PG — Procter &amp; Gamble Co.**
-  - 종합 점수: 68점
-  - 스토리: 성장기 (Expansion)
-
-**2. XOM — Exxon Mobil Corp.**
-  - 종합 점수: 66점
-  - 스토리: 성장기 (Expansion)
-
-**3. MA — Mastercard Inc.**
-  - 종합 점수: 65점
-  - 스토리: 성장기 (Expansion)
-
-## 한국 관심 종목 TOP 3
-
-_오늘은 조건을 충족하는 종목이 없습니다._
-
-## 자산 배분 의견
-
-- 주식: **35%**
-- 금: **25%**
-- 현금/채권: **40%**
-
-_고변동성 — 현금 비중 우선_
-
----
-
-&gt; **투자 유의사항**: 본 자료는 공개 시장 데이터 기반의 투자 참고용 정보로, 특정 종목의 매수·매도를 권유하지 않습니다. 투자 판단과 손익 책임은 전적으로 투자자 본인에게 있습니다.</div>
+  <div class="text-box" id="blog-text">{{ blog }}</div>
   <button class="copy-btn" onclick="copyText('blog-text')">📋 복사하기</button>
 </div>
 
@@ -3111,24 +767,6 @@ function tab(name, el){
 function copyText(id){
   const el = document.getElementById(id);
   navigator.clipboard.writeText(el.textContent).then(()=>alert('복사 완료!'));
-}
-function toggleAccordion(row){
-  const detail = row.nextElementSibling;
-  if(!detail || !detail.classList.contains('top10-detail')) return;
-  const isOpen = row.classList.contains('open');
-
-  // 다른 행 모두 닫기
-  document.querySelectorAll('.top10-row.open').forEach(r => {
-    r.classList.remove('open');
-    const d = r.nextElementSibling;
-    if(d && d.classList.contains('top10-detail')) d.style.display = 'none';
-  });
-
-  // 이 행만 토글
-  if(!isOpen){
-    row.classList.add('open');
-    detail.style.display = 'table-row';
-  }
 }
 </script>
 </body>
