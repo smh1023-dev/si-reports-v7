@@ -160,6 +160,18 @@ td{padding:.72rem .5rem;border-bottom:1px solid rgba(212,178,94,.08);color:var(-
 
 @media(max-width:900px){.top3-grid{grid-template-columns:1fr}.highlight-grid{grid-template-columns:1fr}}
 @media(max-width:700px){.page{padding:1.2rem}.sec-title{font-size:1.6rem}nav{padding:.8rem 1rem}.tabs{padding:0 1rem}}
+.supplier-box{margin-top:.9rem;padding:.8rem .9rem;background:rgba(212,178,94,.06);border:1px solid rgba(212,178,94,.2);border-radius:4px}
+.supplier-title{font-size:.78rem;color:var(--gold2);margin-bottom:.5rem;letter-spacing:.04em;font-weight:600}
+.supplier-item{display:flex;flex-direction:column;gap:1px;padding:.35rem 0;border-bottom:1px solid rgba(212,178,94,.08)}
+.supplier-item:last-of-type{border-bottom:none}
+.supplier-name{font-size:.84rem;color:var(--white);font-weight:600;font-family:'DM Mono',monospace}
+.supplier-reason{font-size:.76rem;color:var(--gray);line-height:1.4}
+.supplier-note{margin-top:.5rem;font-size:.68rem;color:#7a7972;font-style:italic}
+.top10-detail-row td{padding:0!important;background:var(--bg2)}
+.top10-detail{padding:1.2rem 1.4rem;border-left:3px solid var(--gold)}
+.top10-row-clickable{cursor:pointer;transition:background .15s}
+.top10-row-clickable:hover{background:rgba(212,178,94,.06)}
+.top10-expand-hint{color:var(--gold2);font-size:.7rem}
 </style>
 </head>
 <body>
@@ -312,6 +324,16 @@ td{padding:.72rem .5rem;border-bottom:1px solid rgba(212,178,94,.08);color:var(-
         <div class="risk-pill"><span class="lbl">리스크</span>{{ r.risk_score_str }}</div>
       </div>
 
+      {% if st.get('suppliers') %}
+      <div class="supplier-box">
+        <div class="supplier-title">🔗 대표 협력사 (상장 공급망)</div>
+        {% for sp in st.get('suppliers') %}
+        <div class="supplier-item"><span class="supplier-name">{{ sp.name }}</span><span class="supplier-reason">{{ sp.reason }}</span></div>
+        {% endfor %}
+        <div class="supplier-note">※ AI 추정 공급망 정보 — 참고용이며 부정확할 수 있습니다.</div>
+      </div>
+      {% endif %}
+
       <div class="top3-meta" style="margin-top:.8rem">
         <div class="top3-meta-row"><span class="top3-meta-label">현재가</span><span class="top3-meta-value">{{ r.price_str }}</span></div>
         <div class="top3-meta-row"><span class="top3-meta-label">등락률</span><span class="top3-meta-value {{ 'up' if r.change_pct >= 0 else 'down' }}">{{ '+' if r.change_pct >= 0 else '' }}{{ '%.2f'|format(r.change_pct) }}%</span></div>
@@ -356,9 +378,10 @@ td{padding:.72rem .5rem;border-bottom:1px solid rgba(212,178,94,.08);color:var(-
         </thead>
         <tbody>
           {% for r in top10 %}
-          <tr>
+          {% set st = stories.get(r.ticker, {}) %}
+          <tr class="top10-row-clickable" onclick="toggleDetail('kr-{{ r.ticker }}')">
             <td style="color:#7a7972">{{ loop.index }}</td>
-            <td class="ticker">{{ r.ticker }}</td>
+            <td class="ticker">{{ r.ticker }} <span class="top10-expand-hint">▼</span></td>
             <td style="color:#b8b3a4;font-size:.84rem;max-width:160px;overflow:hidden;text-overflow:ellipsis">{{ r.name }}</td>
             <td style="color:#7a7972;font-size:.78rem">{{ r.sector }}</td>
             <td style="text-align:right;font-family:'DM Mono',monospace">{{ r.price_str }}</td>
@@ -377,6 +400,52 @@ td{padding:.72rem .5rem;border-bottom:1px solid rgba(212,178,94,.08);color:var(-
               {% if r.verdict == '관심' %}<span class="verdict v-watch">관심</span>
               {% elif r.verdict == '보류' %}<span class="verdict v-hold">보류</span>
               {% else %}<span class="verdict v-fail">미충족</span>{% endif %}
+            </td>
+          </tr>
+          <tr class="top10-detail-row" id="detail-kr-{{ r.ticker }}" style="display:none">
+            <td colspan="15">
+              <div class="top10-detail">
+                <div style="font-size:1rem;color:var(--gold2);font-weight:700;margin-bottom:.8rem">{{ r.ticker }} · {{ r.name }} 상세 분석</div>
+                {% if st.get('thesis') %}
+                <div class="ai-summary" style="margin-bottom:.9rem">
+                  <div class="ai-summary-label">📖 Damodaran 투자 논리</div>
+                  <div class="ai-summary-text">{{ st.get('thesis') }}</div>
+                </div>
+                {% endif %}
+                <div class="story-grid">
+                  <div class="story-cell"><div class="story-icon">🛡️ 해자 (Moat)</div><div class="story-text">{{ st.get('moat', '데이터 부족') }}</div></div>
+                  <div class="story-cell"><div class="story-icon">📈 성장 동인</div><div class="story-text">{{ st.get('growth', '데이터 부족') }}</div></div>
+                  <div class="story-cell"><div class="story-icon">⚠️ 리스크 요인</div><div class="story-text">{{ st.get('risk', '검토 필요') }}</div></div>
+                  <div class="story-cell"><div class="story-icon">🚀 메가트렌드</div><div class="story-text">{{ st.get('megatrend', '검토 필요') }}</div></div>
+                </div>
+                <div class="story-grid" style="margin-top:.6rem">
+                  <div class="story-cell">
+                    <div class="story-icon">📊 위험 변화 (정량)</div>
+                    <div class="story-text">
+                      {% set rc = st.get('risk_change', {}) %}
+                      <strong class="{{ 'check-pass' if rc.get('score',0) >= 2 else 'check-warn' if rc.get('score',0) == 1 else 'check-fail' }}">{{ rc.get('verdict', '—') }}</strong><br>
+                      <span class="dim">{{ rc.get('signals', '') }}</span>
+                    </div>
+                  </div>
+                  <div class="story-cell">
+                    <div class="story-icon">💰 밸류에이션 (정량)</div>
+                    <div class="story-text">
+                      {% set vl = st.get('valuation', {}) %}
+                      <strong class="{{ 'check-pass' if vl.get('pass_ratio',0) >= 0.7 else 'check-warn' if vl.get('pass_ratio',0) >= 0.4 else 'check-fail' }}">{{ vl.get('verdict', '—') }}</strong><br>
+                      <span class="dim">{{ vl.get('checks', '') }}</span>
+                    </div>
+                  </div>
+                </div>
+                {% if st.get('suppliers') %}
+                <div class="supplier-box" style="margin-top:.8rem">
+                  <div class="supplier-title">🔗 대표 협력사 (상장 공급망)</div>
+                  {% for sp in st.get('suppliers') %}
+                  <div class="supplier-item"><span class="supplier-name">{{ sp.name }}</span><span class="supplier-reason">{{ sp.reason }}</span></div>
+                  {% endfor %}
+                  <div class="supplier-note">※ AI 추정 공급망 정보 — 참고용이며 부정확할 수 있습니다.</div>
+                </div>
+                {% endif %}
+              </div>
             </td>
           </tr>
           {% else %}
@@ -610,6 +679,11 @@ td{padding:.72rem .5rem;border-bottom:1px solid rgba(212,178,94,.08);color:var(-
 </div>
 
 <script>
+function toggleDetail(id){
+  var row=document.getElementById('detail-'+id);
+  if(!row)return;
+  row.style.display = (row.style.display==='none'||!row.style.display) ? 'table-row' : 'none';
+}
 function tab(name, el){
   document.querySelectorAll('.tabs > .tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
