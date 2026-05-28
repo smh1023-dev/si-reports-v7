@@ -161,17 +161,30 @@ function loadPrices(){
 // ── 분석 엔진 ──
 function analyze(p,price,total){
   var prof=RISK[S.profile]||RISK.moderate;
-  var qty=num(p.qty),avg=num(p.avg),target=num(p.target),stop=num(p.stop);
-  var mv=qty*price, cost=qty*avg, pnl=mv-cost, roi=cost>0?pnl/cost*100:0, w=total>0?mv/total*100:0;
-  var upside=(target>0&&price>0)?(target-price)/price*100:null;
-  var downside=(stop>0&&price>0)?(price-stop)/price*100:null;
+  var qty=num(p.qty),avg=num(p.avg);
+  var price0=num(price);
+  // ── 목표가·손절가: 사용자 입력이 없으면 자동 추천 ──
+  // 추천 로직: 기준가(현재가 우선, 없으면 평단가) 대비
+  //   - 성향별 목표 상승폭 / 손절 하락폭 적용
+  var refPx = price0>0 ? price0 : avg;
+  var TGT_UP = {conservative:0.15, moderate:0.25, aggressive:0.40}[S.profile] || 0.25; // 목표 상승폭
+  var STP_DN = {conservative:0.07, moderate:0.10, aggressive:0.15}[S.profile] || 0.10; // 손절 하락폭
+  var target = num(p.target);
+  var stop   = num(p.stop);
+  var targetAuto=false, stopAuto=false;
+  if(target<=0 && refPx>0 && p.assetType!=="cash"){ target = refPx*(1+TGT_UP); targetAuto=true; }
+  if(stop<=0   && p.assetType!=="cash"){ var sBase=(avg>0?avg:refPx); if(sBase>0){ stop=sBase*(1-STP_DN); stopAuto=true; } }
+
+  var mv=qty*price0, cost=qty*avg, pnl=mv-cost, roi=cost>0?pnl/cost*100:0, w=total>0?mv/total*100:0;
+  var upside=(target>0&&price0>0)?(target-price0)/price0*100:null;
+  var downside=(stop>0&&price0>0)?(price0-stop)/price0*100:null;
   var rr=(upside!=null&&downside!=null&&downside>0)?upside/downside:null;
-  var posVsAvg=avg>0?(price-avg)/avg*100:0;
-  if(p.assetType==="cash") return {mv:mv,pnl:0,roi:0,weight:w,upside:null,downside:null,rr:null,verdict:"현금",tone:"cash",reasons:["현금성 자산"],buy1:null,buy2:null,recBuy:0,recSell:0};
+  var posVsAvg=avg>0?(price0-avg)/avg*100:0;
+  if(p.assetType==="cash") return {mv:mv,pnl:0,roi:0,weight:w,upside:null,downside:null,rr:null,verdict:"현금",tone:"cash",reasons:["현금성 자산"],buy1:null,buy2:null,recBuy:0,recSell:0,recBuyShares:0,recSellShares:0,target:target,stop:stop,targetAuto:false,stopAuto:false};
   var verdict="보유",tone="hold",reasons=[];
-  if(stop>0&&price<=stop){verdict="전량매도 검토";tone="danger";reasons.push("현재가가 손절가를 이탈했습니다.");}
-  else if(roi<=-10&&stop>0&&downside!=null&&downside<3){verdict="전량매도 검토";tone="danger";reasons.push("손실 -10% 이하이며 손절가에 근접했습니다.");}
-  else if(target>0&&price>=target){verdict="일부매도";tone="trim";reasons.push("목표가에 도달했습니다. 분할 이익실현 검토.");}
+  if(stop>0&&price0>0&&price0<=stop){verdict="전량매도 검토";tone="danger";reasons.push("현재가가 손절가를 이탈했습니다.");}
+  else if(roi<=-10&&downside!=null&&downside<3){verdict="전량매도 검토";tone="danger";reasons.push("손실 -10% 이하이며 손절가에 근접했습니다.");}
+  else if(target>0&&price0>0&&price0>=target){verdict="일부매도";tone="trim";reasons.push("목표가에 도달했습니다. 분할 이익실현 검토.");}
   else if(roi>=20){verdict="일부매도";tone="trim";reasons.push("수익률 "+roi.toFixed(1)+"% — 과열 구간, 일부 이익실현 검토.");}
   else if(w>=prof.maxW){verdict="일부매도";tone="trim";reasons.push("비중 "+w.toFixed(1)+"%가 권장 상한("+prof.maxW+"%)을 초과.");}
   else{
@@ -183,11 +196,15 @@ function analyze(p,price,total){
       if(!rrOk)reasons.push("손익비 "+(rr!=null?rr.toFixed(2):"-")+" (<"+prof.rr+") — 신규매수 보류.");
       if(!wOk)reasons.push("이미 적정 비중 — 추가매수 신중.");}
   }
-  var buy1=(tone==="buy"&&price>0)?price*0.97:null, buy2=(tone==="buy"&&price>0)?price*0.93:null;
+  var buy1=(tone==="buy"&&price0>0)?price0*0.97:null, buy2=(tone==="buy"&&price0>0)?price0*0.93:null;
   var tv=total*(prof.maxW/100);
   var recBuy=(tone==="buy")?Math.max(0,tv-mv):0;
   var recSell=(tone==="trim"||tone==="danger")?Math.max(0,mv-tv):0;
-  return {mv:mv,pnl:pnl,roi:roi,weight:w,upside:upside,downside:downside,rr:rr,posVsAvg:posVsAvg,verdict:verdict,tone:tone,reasons:reasons,buy1:buy1,buy2:buy2,recBuy:recBuy,recSell:recSell};
+  // ── 추천 주식 수 (금액 ÷ 현재가, 정수) ──
+  var recBuyShares  = (recBuy>0  && price0>0) ? Math.floor(recBuy/price0)  : 0;
+  var recSellShares = (recSell>0 && price0>0) ? Math.min(qty, Math.ceil(recSell/price0)) : 0;
+  if(tone==="danger") recSellShares = qty; // 손절 이탈 시 전량
+  return {mv:mv,pnl:pnl,roi:roi,weight:w,upside:upside,downside:downside,rr:rr,posVsAvg:posVsAvg,verdict:verdict,tone:tone,reasons:reasons,buy1:buy1,buy2:buy2,recBuy:recBuy,recSell:recSell,recBuyShares:recBuyShares,recSellShares:recSellShares,target:target,stop:stop,targetAuto:targetAuto,stopAuto:stopAuto};
 }
 
 // 전체 계산 결과 캐시
@@ -280,17 +297,21 @@ function render(){
 
   var rows=S.positions.map(function(p){
     var a=c.A[p.id], pr=priceOf(p), fe=fetched(p), sy=sym(p.currency);
+    var d2=p.currency==="USD"?2:0;
     var priceCell=p.assetType==="cash"?'<span class="muted">-</span>':
-      fe?'<span class="up num">'+sy+fmt(pr,p.currency==="USD"?2:0)+'</span>':
-      '<input class="in-md num" style="border-color:rgba(251,191,36,.5);color:#fbbf24" type="number" placeholder="직접입력" value="'+esc(p.manualPrice)+'" oninput="upd(\''+p.id+'\',\'manualPrice\',this.value)">';
+      fe?'<span class="up num">'+sy+fmt(pr,d2)+'</span>':
+      '<input data-fid="'+p.id+'" data-field="manualPrice" class="in-md num" style="border-color:rgba(251,191,36,.5);color:#fbbf24" type="number" step="any" placeholder="직접입력" value="'+esc(p.manualPrice)+'" oninput="upd(\''+p.id+'\',\'manualPrice\',this.value)">';
+    // 목표가·손절가: 사용자가 안 넣으면 추천값을 회색 placeholder로
+    var tgtPH = (a.targetAuto && a.target>0) ? '추천 '+fmt(a.target,d2) : '목표가';
+    var stpPH = (a.stopAuto && a.stop>0) ? '추천 '+fmt(a.stop,d2) : '손절가';
     return '<tr>'+
-      '<td><input class="in-tk num" value="'+esc(p.ticker)+'" placeholder="AAPL" oninput="upd(\''+p.id+'\',\'ticker\',this.value)"></td>'+
+      '<td><input data-fid="'+p.id+'" data-field="ticker" class="in-tk num" value="'+esc(p.ticker)+'" placeholder="AAPL" oninput="upd(\''+p.id+'\',\'ticker\',this.value)"></td>'+
       '<td><select onchange="upd(\''+p.id+'\',\'assetType\',this.value)"><option value="stock"'+(p.assetType==="stock"?" selected":"")+'>주식</option><option value="ETF"'+(p.assetType==="ETF"?" selected":"")+'>ETF</option><option value="cash"'+(p.assetType==="cash"?" selected":"")+'>현금</option></select></td>'+
-      '<td><input class="in-sm num" type="number" value="'+esc(p.qty)+'" oninput="upd(\''+p.id+'\',\'qty\',this.value)"></td>'+
-      '<td><input class="in-md num" type="number" value="'+esc(p.avg)+'" oninput="upd(\''+p.id+'\',\'avg\',this.value)"></td>'+
+      '<td><input data-fid="'+p.id+'" data-field="qty" class="in-sm num" type="number" step="any" value="'+esc(p.qty)+'" oninput="upd(\''+p.id+'\',\'qty\',this.value)"></td>'+
+      '<td><input data-fid="'+p.id+'" data-field="avg" class="in-md num" type="number" step="any" value="'+esc(p.avg)+'" oninput="upd(\''+p.id+'\',\'avg\',this.value)"></td>'+
       '<td>'+priceCell+'</td>'+
-      '<td><input class="in-md num" type="number" value="'+esc(p.target)+'" oninput="upd(\''+p.id+'\',\'target\',this.value)"></td>'+
-      '<td><input class="in-md num" type="number" value="'+esc(p.stop)+'" oninput="upd(\''+p.id+'\',\'stop\',this.value)"></td>'+
+      '<td><input data-fid="'+p.id+'" data-field="target" class="in-md num" type="number" step="any" value="'+esc(p.target)+'" placeholder="'+tgtPH+'" oninput="upd(\''+p.id+'\',\'target\',this.value)"></td>'+
+      '<td><input data-fid="'+p.id+'" data-field="stop" class="in-md num" type="number" step="any" value="'+esc(p.stop)+'" placeholder="'+stpPH+'" oninput="upd(\''+p.id+'\',\'stop\',this.value)"></td>'+
       '<td class="num" style="color:'+(a.roi>=0?"#34d399":"#fb7185")+'">'+(p.assetType==="cash"?"-":pct(a.roi))+'</td>'+
       '<td class="num">'+(a.weight||0).toFixed(1)+'%</td>'+
       '<td class="num">'+(a.rr!=null?a.rr.toFixed(2):"-")+'</td>'+
@@ -303,12 +324,15 @@ function render(){
   // 매수/매도 제안
   var actionable=S.positions.filter(function(p){return p.assetType!=="cash"&&["buy","trim","danger"].indexOf(c.A[p.id].tone)>=0;});
   var adviceHTML=actionable.length===0?'<p class="muted" style="font-size:13px">현재 액션 권장 종목이 없습니다. (전체 관망/보유)</p>':
-    actionable.map(function(p){var a=c.A[p.id],sy=sym(p.currency);
+    actionable.map(function(p){var a=c.A[p.id],sy=sym(p.currency),d2=p.currency==="USD"?2:0;
       var ex=a.tone==="buy"?
-        '<div>1차 매수가 <b class="up">'+sy+fmt(a.buy1,p.currency==="USD"?2:0)+'</b></div><div>2차 매수가 <b class="up">'+sy+fmt(a.buy2,p.currency==="USD"?2:0)+'</b></div><div style="grid-column:1/3">권장 매수금액 <b class="up">'+fmt(a.recBuy)+'</b></div>':
-        (a.recSell>0?'<div style="grid-column:1/3">권장 매도금액 <b style="color:#fbbf24">'+fmt(a.recSell)+'</b></div>':"");
+        '<div>1차 매수가 <b class="up">'+sy+fmt(a.buy1,d2)+'</b></div><div>2차 매수가 <b class="up">'+sy+fmt(a.buy2,d2)+'</b></div>'+
+        '<div style="grid-column:1/3;margin-top:2px">👉 <b class="up">약 '+fmt(a.recBuyShares)+'주</b> 추가매수 (≈'+fmt(a.recBuy)+')</div>':
+        (a.recSellShares>0?'<div style="grid-column:1/3;margin-top:2px">👉 <b style="color:#fbbf24">약 '+fmt(a.recSellShares)+'주</b> 매도'+(a.tone==="danger"?' (전량 검토)':'')+' (≈'+fmt(a.recSell)+')</div>':"");
+      var lvls='<div>목표가 <b>'+sy+fmt(a.target,d2)+(a.targetAuto?' <span class="muted" style="font-weight:400">(추천)</span>':'')+'</b></div>'+
+               '<div>손절가 <b>'+sy+fmt(a.stop,d2)+(a.stopAuto?' <span class="muted" style="font-weight:400">(추천)</span>':'')+'</b></div>';
       return '<div class="advice" style="background:'+TONE[a.tone].bg+'"><div class="top"><b class="num">'+esc(p.ticker)+'</b><span class="pill" style="background:rgba(0,0,0,.2);color:'+TONE[a.tone].fg+'">'+TONE[a.tone].label+'</span></div>'+
-        '<div class="grid2"><div>수익률 <b style="color:'+(a.roi>=0?"#34d399":"#fb7185")+'">'+pct(a.roi)+'</b></div><div>비중 <b>'+a.weight.toFixed(1)+'%</b></div><div>상승여력 <b>'+(a.upside!=null?pct(a.upside):"-")+'</b></div><div>손익비 <b>'+(a.rr!=null?a.rr.toFixed(2):"-")+'</b></div>'+ex+'</div>'+
+        '<div class="grid2"><div>수익률 <b style="color:'+(a.roi>=0?"#34d399":"#fb7185")+'">'+pct(a.roi)+'</b></div><div>비중 <b>'+a.weight.toFixed(1)+'%</b></div><div>상승여력 <b>'+(a.upside!=null?pct(a.upside):"-")+'</b></div><div>손익비 <b>'+(a.rr!=null?a.rr.toFixed(2):"-")+'</b></div>'+lvls+ex+'</div>'+
         '<div class="reason" style="color:'+TONE[a.tone].fg+'">'+esc(a.reasons.join(" "))+'</div></div>';
     }).join("");
 
@@ -366,8 +390,8 @@ function simBlock(c){
   var p=S.positions.filter(function(x){return x.id===S.sim.id;})[0];
   if(!p)return html+'<p class="muted" style="font-size:13px">종목을 선택하면 추가매수 후 평단가·비중·수익률 변화를 계산합니다.</p>';
   html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">'+
-    '<div><div class="muted" style="font-size:12px;margin-bottom:4px">추가 매수 수량</div><input class="num" style="width:100%" type="number" value="'+esc(S.sim.addQty)+'" oninput="S.sim.addQty=this.value;render()"></div>'+
-    '<div><div class="muted" style="font-size:12px;margin-bottom:4px">추가 매수 가격</div><input class="num" style="width:100%" type="number" value="'+esc(S.sim.addPrice)+'" oninput="S.sim.addPrice=this.value;render()"></div></div>';
+    '<div><div class="muted" style="font-size:12px;margin-bottom:4px">추가 매수 수량</div><input class="num" style="width:100%" type="number" step="any" value="'+esc(S.sim.addQty)+'" oninput="S.sim.addQty=this.value;render()"></div>'+
+    '<div><div class="muted" style="font-size:12px;margin-bottom:4px">추가 매수 가격</div><input class="num" style="width:100%" type="number" step="any" value="'+esc(S.sim.addPrice)+'" oninput="S.sim.addPrice=this.value;render()"></div></div>';
   var addQty=num(S.sim.addQty),addPrice=num(S.sim.addPrice);
   if(addQty>0){
     var cur=priceOf(p),oq=num(p.qty),oa=num(p.avg),nq=oq+addQty,na=(oq*oa+addQty*addPrice)/nq;
@@ -392,8 +416,22 @@ function upd(id,field,val){
     return np;
   });
   persist();
-  if(field==="ticker"){clearTimeout(window._tkT);window._tkT=setTimeout(loadPrices,600);}
-  render();
+  if(field==="ticker"){clearTimeout(window._tkT);window._tkT=setTimeout(loadPrices,800);}
+  // 입력 중 커서가 날아가지 않도록: 즉시 render 대신 디바운스 + 포커스 복원
+  clearTimeout(window._renderT);
+  window._focusInfo={id:id,field:field};
+  window._renderT=setTimeout(function(){ render(); restoreFocus(); }, 400);
+}
+// render 후, 방금 입력하던 칸으로 포커스 복원 (값·커서 보존)
+function restoreFocus(){
+  var fi=window._focusInfo; if(!fi)return;
+  var sel='[data-fid="'+fi.id+'"][data-field="'+fi.field+'"]';
+  var el=document.querySelector(sel);
+  if(el){
+    el.focus();
+    // 커서를 끝으로 (소수점 입력 중 값 훼손 방지: value 재설정 안 함)
+    try{ var L=el.value.length; el.setSelectionRange(L,L); }catch(e){}
+  }
 }
 function addRow(){S.positions.push({id:uid(),ticker:"",name:"",assetType:"stock",currency:"USD",qty:"",avg:"",target:"",stop:"",memo:"",manualPrice:""});persist();render();}
 function del(id){S.positions=S.positions.filter(function(p){return p.id!==id;});if(S.sim.id===id)S.sim={id:null,addQty:"",addPrice:""};persist();render();}
