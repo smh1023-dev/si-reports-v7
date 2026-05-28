@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>에스아이스토리 — 내 포트폴리오 운영 시스템</title>
+<style>
+  :root{
+    --base:#0a0e14; --panel:#121821; --panel2:#1a222e; --line:#26303d;
+    --teal:#34d399; --tealdim:#0f3d33; --rose:#fb7185; --rosedim:#3d1620;
+    --amber:#fbbf24; --amberdim:#3a2f12; --sky:#38bdf8; --muted:#8b9bb0; --text:#e6edf5;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:var(--base); color:var(--text); font-family:'Malgun Gothic','맑은 고딕',-apple-system,sans-serif; line-height:1.5; -webkit-font-smoothing:antialiased;}
+  .num{font-variant-numeric:tabular-nums;}
+  .wrap{max-width:1180px; margin:0 auto; padding:0 20px;}
+  header{border-bottom:1px solid var(--line);
+    background:radial-gradient(1000px 260px at 12% -10%, rgba(52,211,153,.08), transparent),
+               radial-gradient(800px 220px at 88% -20%, rgba(56,189,248,.06), transparent);}
+  .hd{padding:24px 0;}
+  .row{display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between;}
+  .brand{color:var(--teal); font-weight:700; font-size:13px; letter-spacing:.04em;}
+  .badge{font-size:11px; padding:2px 9px; border-radius:999px; font-weight:700; background:var(--tealdim); color:var(--teal);}
+  h1{font-size:24px; font-weight:800; margin-top:6px;}
+  h1 em{font-style:normal; color:var(--teal);}
+  .sub{color:var(--muted); font-size:12px; margin-top:5px;}
+  .card{background:var(--panel); border:1px solid var(--line); border-radius:16px;}
+  .pad{padding:16px;}
+  select,input,button{font-family:inherit; font-size:14px;}
+  select,input{background:var(--panel2); border:1px solid var(--line); color:var(--text); border-radius:10px; padding:8px 10px;}
+  input::placeholder{color:#5c6b7e;}
+  button{cursor:pointer; border:none; border-radius:10px; padding:8px 14px; font-weight:600;}
+  .btn-primary{background:var(--tealdim); color:var(--teal);}
+  .btn-ghost{background:var(--panel2); color:var(--text); border:1px solid var(--line);}
+  .btn-danger{background:var(--panel2); color:var(--rose); border:1px solid var(--line);}
+  .proxybar{margin-top:16px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
+  .proxybar input{flex:1; min-width:220px;}
+  .status{margin-top:10px; font-size:12px; color:var(--muted); display:flex; gap:12px; flex-wrap:wrap; align-items:center;}
+  main{padding:24px 0;}
+  .stats{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:24px;}
+  @media(max-width:760px){.stats{grid-template-columns:repeat(2,1fr);}}
+  .stat .lbl{color:var(--muted); font-size:12px; margin-bottom:4px;}
+  .stat .val{font-size:24px; font-weight:800;}
+  .stat .sub2{color:var(--muted); font-size:11px; margin-top:3px;}
+  .grid3{display:grid; grid-template-columns:2fr 1fr; gap:24px; align-items:start;}
+  @media(max-width:980px){.grid3{grid-template-columns:1fr;}}
+  .colL{display:flex; flex-direction:column; gap:24px;}
+  .colR{display:flex; flex-direction:column; gap:24px;}
+  .sec-title{font-weight:800; margin-bottom:14px;}
+  .sec-title em{font-style:normal; color:var(--teal);}
+  table{width:100%; border-collapse:separate; border-spacing:0; font-size:13px;}
+  th{text-align:left; color:var(--muted); font-size:11px; font-weight:500; padding:8px; white-space:nowrap; border-bottom:1px solid var(--line);}
+  td{padding:7px 8px; border-bottom:1px solid rgba(38,48,61,.5); white-space:nowrap;}
+  tr:hover td{background:rgba(26,34,46,.4);}
+  td input,td select{padding:5px 7px; border-radius:7px;}
+  .in-tk{width:78px; text-transform:uppercase;}
+  .in-sm{width:80px;} .in-md{width:92px;}
+  .pill{font-size:11px; padding:2px 9px; border-radius:999px; font-weight:700;}
+  .add-btn{margin-top:12px; width:100%;}
+  .charts{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  @media(max-width:760px){.charts{grid-template-columns:1fr;}}
+  .chart-box h3{font-size:13px; font-weight:800; margin-bottom:10px;}
+  .chart-box h3 em{font-style:normal; color:var(--teal);}
+  .warn{font-size:12px; padding:9px 10px; border-radius:10px; margin-bottom:8px; display:flex; gap:8px;}
+  .legend{display:flex; align-items:center; gap:8px; margin-bottom:8px; font-size:12px;}
+  .bar-track{flex:1; height:8px; border-radius:999px; background:var(--panel2); overflow:hidden;}
+  .bar-fill{height:100%; border-radius:999px;}
+  .advice{padding:12px; border-radius:12px; margin-bottom:12px;}
+  .advice .top{display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;}
+  .advice .grid2{display:grid; grid-template-columns:1fr 1fr; gap:3px 12px; font-size:12px; color:var(--muted);}
+  .advice .reason{font-size:12px; margin-top:8px; line-height:1.5;}
+  .simrow{display:flex; justify-content:space-between; padding:3px 0; font-size:13px;}
+  .simrow .k{color:var(--muted); font-size:12px;}
+  .footer{text-align:center; color:var(--muted); font-size:12px; padding:32px 0; border-top:1px solid var(--line); line-height:1.7; margin-top:24px;}
+  .hide{display:none;}
+  .muted{color:var(--muted);}
+  .up{color:var(--teal);} .down{color:var(--rose);}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+/* ===========================================================
+   에스아이스토리 포트폴리오 운영 시스템 — 무외부의존 버전
+   (React/Recharts 없이 순수 JS + SVG. 인터넷 없이 더블클릭으로 열림)
+   =========================================================== */
+"use strict";
+
+// ── 상수 ──
+var LS_KEY="sistory_pf_v2", LS_SNAP="sistory_pf_snap_v2", LS_PROXY="sistory_proxy_url";
+var DEFAULT_PROXY_URL=""; // 본인 Cloudflare Worker 주소를 넣으면 자동 연동
+var PRICES_URL="./portfolio_prices.json";
+var RISK={conservative:{label:"보수적",maxW:20,rr:2.0},moderate:{label:"중립적",maxW:30,rr:1.5},aggressive:{label:"공격적",maxW:40,rr:1.2}};
+var TYPE_LABEL={stock:"주식",ETF:"ETF",cash:"현금"};
+var TYPE_COLOR={stock:"#38bdf8",ETF:"#34d399",cash:"#8b9bb0"};
+var PIE=["#34d399","#38bdf8","#fbbf24","#fb7185","#a78bfa","#f472b6","#22d3ee","#facc15","#4ade80","#60a5fa"];
+var TONE={buy:{bg:"#0f3d33",fg:"#34d399",label:"추가매수 가능"},hold:{bg:"#1a222e",fg:"#8b9bb0",label:"관망"},
+  trim:{bg:"#3a2f12",fg:"#fbbf24",label:"일부매도"},danger:{bg:"#3d1620",fg:"#fb7185",label:"전량매도 검토"},cash:{bg:"#1a222e",fg:"#8b9bb0",label:"현금"}};
+
+// ── 유틸 ──
+function num(v){return (v===""||v==null||isNaN(v))?0:Number(v);}
+function uid(){return Math.random().toString(36).slice(2,9);}
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+function fmt(v,d){d=d||0; if(v==null||isNaN(v))return "-"; return Number(v).toLocaleString("ko-KR",{minimumFractionDigits:d,maximumFractionDigits:d});}
+function pct(v,d){d=(d==null?1:d); if(v==null||isNaN(v))return "-"; return (v>=0?"+":"")+Number(v).toFixed(d)+"%";}
+function sym(c){return c==="KRW"?"₩":"$";}
+function stamp(){var d=new Date();var k=new Date(d.getTime()+(540+d.getTimezoneOffset())*60000);
+  function p(n){return String(n).padStart(2,"0");}
+  return k.getFullYear()+"-"+p(k.getMonth()+1)+"-"+p(k.getDate())+" "+p(k.getHours())+":"+p(k.getMinutes());}
+function today(){return stamp().slice(0,10);}
+
+// ── 전역 상태 ──
+var S={positions:[],prices:{},meta:null,profile:"moderate",savedAt:null,loading:true,
+  proxy:DEFAULT_PROXY_URL,proxyInput:"",sim:{id:null,addQty:"",addPrice:""},snaps:[]};
+
+// ── 저장/복원 ──
+function persist(){
+  S.savedAt=stamp();
+  try{localStorage.setItem(LS_KEY,JSON.stringify({positions:S.positions,profile:S.profile,savedAt:S.savedAt}));}catch(e){}
+}
+function restore(){
+  try{
+    var raw=localStorage.getItem(LS_KEY);
+    if(raw){var d=JSON.parse(raw); S.positions=d.positions||[]; S.profile=d.profile||"moderate"; S.savedAt=d.savedAt||null;}
+    else{S.positions=[{id:uid(),ticker:"AAPL",name:"Apple Inc.",assetType:"stock",currency:"USD",qty:10,avg:200,target:280,stop:180,memo:"",manualPrice:""}];}
+  }catch(e){S.positions=[];}
+  try{S.snaps=JSON.parse(localStorage.getItem(LS_SNAP)||"[]");}catch(e){S.snaps=[];}
+  var pr=localStorage.getItem(LS_PROXY);
+  if(pr){S.proxy=pr; S.proxyInput=pr;} else if(DEFAULT_PROXY_URL){S.proxyInput=DEFAULT_PROXY_URL;}
+}
+
+// ── 현재가 helper ──
+function getRec(p){return S.prices[(p.ticker||"").toUpperCase()];}
+function priceOf(p){var r=getRec(p); if(r&&r.priceFetched&&r.currentPrice!=null)return r.currentPrice;
+  if(p.manualPrice!==""&&p.manualPrice!=null)return num(p.manualPrice); return 0;}
+function fetched(p){var r=getRec(p); return !!(r&&r.priceFetched&&r.currentPrice!=null);}
+
+// ── 시세 조회 (프록시 우선, 없으면 prices.json) ──
+function loadPrices(){
+  var tks=[]; var seen={};
+  S.positions.forEach(function(p){var t=(p.ticker||"").trim().toUpperCase(); if(t&&!seen[t]){seen[t]=1; tks.push(t);}});
+  if(tks.length===0){S.loading=false; render(); return;}
+  S.loading=true; render();
+  var done=function(map,meta){for(var k in map)S.prices[k]=map[k]; S.meta=meta; S.loading=false; render();};
+  var fail=function(mode){S.meta={mode:mode}; S.loading=false; render();};
+
+  if(S.proxy){
+    var base=S.proxy.replace(/\/+$/,"");
+    fetch(base+"/?tickers="+encodeURIComponent(tks.join(",")),{cache:"no-store"})
+      .then(function(r){if(!r.ok)throw 0; return r.json();})
+      .then(function(d){var m={};(d.prices||[]).forEach(function(p){m[p.ticker.toUpperCase()]=p;}); done(m,{mode:"live",updatedAt:d.updatedAt,source:d.source});})
+      .catch(function(){fail("error");});
+  }else{
+    fetch(PRICES_URL,{cache:"no-store"})
+      .then(function(r){if(!r.ok)throw 0; return r.json();})
+      .then(function(d){var m={};(d.prices||[]).forEach(function(p){m[p.ticker.toUpperCase()]=p;}); done(m,{mode:"static"});})
+      .catch(function(){fail("none");});
+  }
+}
+
+// ── 분석 엔진 ──
+function analyze(p,price,total){
+  var prof=RISK[S.profile]||RISK.moderate;
+  var qty=num(p.qty),avg=num(p.avg),target=num(p.target),stop=num(p.stop);
+  var mv=qty*price, cost=qty*avg, pnl=mv-cost, roi=cost>0?pnl/cost*100:0, w=total>0?mv/total*100:0;
+  var upside=(target>0&&price>0)?(target-price)/price*100:null;
+  var downside=(stop>0&&price>0)?(price-stop)/price*100:null;
+  var rr=(upside!=null&&downside!=null&&downside>0)?upside/downside:null;
+  var posVsAvg=avg>0?(price-avg)/avg*100:0;
+  if(p.assetType==="cash") return {mv:mv,pnl:0,roi:0,weight:w,upside:null,downside:null,rr:null,verdict:"현금",tone:"cash",reasons:["현금성 자산"],buy1:null,buy2:null,recBuy:0,recSell:0};
+  var verdict="보유",tone="hold",reasons=[];
+  if(stop>0&&price<=stop){verdict="전량매도 검토";tone="danger";reasons.push("현재가가 손절가를 이탈했습니다.");}
+  else if(roi<=-10&&stop>0&&downside!=null&&downside<3){verdict="전량매도 검토";tone="danger";reasons.push("손실 -10% 이하이며 손절가에 근접했습니다.");}
+  else if(target>0&&price>=target){verdict="일부매도";tone="trim";reasons.push("목표가에 도달했습니다. 분할 이익실현 검토.");}
+  else if(roi>=20){verdict="일부매도";tone="trim";reasons.push("수익률 "+roi.toFixed(1)+"% — 과열 구간, 일부 이익실현 검토.");}
+  else if(w>=prof.maxW){verdict="일부매도";tone="trim";reasons.push("비중 "+w.toFixed(1)+"%가 권장 상한("+prof.maxW+"%)을 초과.");}
+  else{
+    var upOk=upside==null||upside>=10, rrOk=rr==null||rr>=prof.rr, wOk=w<prof.maxW*0.7;
+    if(upOk&&rrOk&&wOk){verdict="추가매수 가능";tone="buy";reasons.push("상승여력·손익비·비중 조건을 충족합니다.");
+      if(posVsAvg<0)reasons.push("평단가 아래 구간 — 추가매수 시 평단 개선 효과.");}
+    else{verdict="관망";tone="hold";
+      if(!upOk)reasons.push("목표가 상승여력 "+(upside!=null?upside.toFixed(1):"-")+"% (<10%) — 추가매수 보류.");
+      if(!rrOk)reasons.push("손익비 "+(rr!=null?rr.toFixed(2):"-")+" (<"+prof.rr+") — 신규매수 보류.");
+      if(!wOk)reasons.push("이미 적정 비중 — 추가매수 신중.");}
+  }
+  var buy1=(tone==="buy"&&price>0)?price*0.97:null, buy2=(tone==="buy"&&price>0)?price*0.93:null;
+  var tv=total*(prof.maxW/100);
+  var recBuy=(tone==="buy")?Math.max(0,tv-mv):0;
+  var recSell=(tone==="trim"||tone==="danger")?Math.max(0,mv-tv):0;
+  return {mv:mv,pnl:pnl,roi:roi,weight:w,upside:upside,downside:downside,rr:rr,posVsAvg:posVsAvg,verdict:verdict,tone:tone,reasons:reasons,buy1:buy1,buy2:buy2,recBuy:recBuy,recSell:recSell};
+}
+
+// 전체 계산 결과 캐시
+function compute(){
+  var total=0; S.positions.forEach(function(p){total+=num(p.qty)*priceOf(p);});
+  var totalCost=0; S.positions.forEach(function(p){totalCost+=(p.assetType==="cash"?num(p.qty):num(p.qty)*num(p.avg));});
+  var A={}; S.positions.forEach(function(p){A[p.id]=analyze(p,priceOf(p),total);});
+  var pnl=0; S.positions.forEach(function(p){pnl+=A[p.id].pnl||0;});
+  var cash=0; S.positions.forEach(function(p){if(p.assetType==="cash")cash+=num(p.qty);});
+  return {total:total,totalCost:totalCost,A:A,pnl:pnl,roi:totalCost>0?pnl/totalCost*100:0,cash:cash,cashW:total>0?cash/total*100:0};
+}
+
+// ── SVG 차트 ──
+function pieSVG(data,size){ // data:[{name,value,color}]
+  size=size||200; var cx=size/2,cy=size/2,r=size/2-6,ir=r*0.55;
+  var tot=data.reduce(function(s,d){return s+d.value;},0);
+  if(tot<=0)return '<div class="muted" style="text-align:center;padding:40px 0;font-size:12px">데이터 없음</div>';
+  var ang=-Math.PI/2, paths="";
+  data.forEach(function(d){
+    var frac=d.value/tot, a2=ang+frac*Math.PI*2;
+    var x1=cx+r*Math.cos(ang),y1=cy+r*Math.sin(ang),x2=cx+r*Math.cos(a2),y2=cy+r*Math.sin(a2);
+    var ix1=cx+ir*Math.cos(a2),iy1=cy+ir*Math.sin(a2),ix2=cx+ir*Math.cos(ang),iy2=cy+ir*Math.sin(ang);
+    var large=frac>0.5?1:0;
+    paths+='<path d="M'+x1+' '+y1+' A'+r+' '+r+' 0 '+large+' 1 '+x2+' '+y2+' L'+ix1+' '+iy1+' A'+ir+' '+ir+' 0 '+large+' 0 '+ix2+' '+iy2+' Z" fill="'+d.color+'" stroke="#0a0e14" stroke-width="2"/>';
+    ang=a2;
+  });
+  var legend=data.map(function(d){return '<div class="legend"><span style="width:10px;height:10px;border-radius:2px;background:'+d.color+';display:inline-block"></span><span>'+esc(d.name)+'</span><span class="muted" style="margin-left:auto">'+(d.value/tot*100).toFixed(1)+'%</span></div>';}).join("");
+  return '<div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap"><svg width="'+size+'" height="'+size+'" viewBox="0 0 '+size+' '+size+'">'+paths+'</svg><div style="flex:1;min-width:120px">'+legend+'</div></div>';
+}
+function barSVG(data){ // data:[{name,roi}]
+  if(data.length===0)return '<div class="muted" style="text-align:center;padding:40px 0;font-size:12px">데이터 없음</div>';
+  var W=Math.max(280,data.length*54),H=200,pad=28,bw=28;
+  var max=Math.max(10,Math.max.apply(null,data.map(function(d){return Math.abs(d.roi);})));
+  var zero=H/2, bars="";
+  data.forEach(function(d,i){
+    var x=pad+i*((W-pad*2)/data.length)+((W-pad*2)/data.length-bw)/2;
+    var h=Math.abs(d.roi)/max*(H/2-pad);
+    var y=d.roi>=0?zero-h:zero, col=d.roi>=0?"#34d399":"#fb7185";
+    bars+='<rect x="'+x+'" y="'+y+'" width="'+bw+'" height="'+Math.max(1,h)+'" rx="4" fill="'+col+'"/>';
+    bars+='<text x="'+(x+bw/2)+'" y="'+(H-8)+'" fill="#8b9bb0" font-size="10" text-anchor="middle">'+esc(d.name)+'</text>';
+    bars+='<text x="'+(x+bw/2)+'" y="'+(d.roi>=0?y-4:y+h+12)+'" fill="'+col+'" font-size="10" text-anchor="middle">'+pct(d.roi)+'</text>';
+  });
+  return '<svg width="100%" viewBox="0 0 '+W+' '+H+'"><line x1="'+pad+'" y1="'+zero+'" x2="'+(W-pad)+'" y2="'+zero+'" stroke="#26303d"/>'+bars+'</svg>';
+}
+function areaSVG(data){ // data:[{date,pnl}]
+  if(data.length<1)return '<div class="muted" style="text-align:center;padding:40px 0;font-size:12px">데이터 없음</div>';
+  if(data.length===1)data=[{date:"",pnl:data[0].pnl},data[0]];
+  var W=480,H=200,pad=30;
+  var vals=data.map(function(d){return d.pnl;});
+  var mn=Math.min.apply(null,vals.concat([0])),mx=Math.max.apply(null,vals.concat([0]));
+  if(mn===mx){mx=mn+1;}
+  var n=data.length;
+  function X(i){return pad+i*((W-pad*2)/(n-1));}
+  function Y(v){return H-pad-(v-mn)/(mx-mn)*(H-pad*2);}
+  var line="",area="M"+X(0)+" "+Y(0);
+  data.forEach(function(d,i){line+=(i===0?"M":"L")+X(i)+" "+Y(d.pnl)+" "; area+="L"+X(i)+" "+Y(d.pnl);});
+  area+="L"+X(n-1)+" "+Y(0)+" Z";
+  var labels=data.map(function(d,i){return d.date?'<text x="'+X(i)+'" y="'+(H-8)+'" fill="#8b9bb0" font-size="9" text-anchor="middle">'+esc(d.date)+'</text>':"";}).join("");
+  return '<svg width="100%" viewBox="0 0 '+W+' '+H+'"><defs><linearGradient id="ag" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#34d399" stop-opacity="0.35"/><stop offset="100%" stop-color="#34d399" stop-opacity="0"/></linearGradient></defs><line x1="'+pad+'" y1="'+Y(0)+'" x2="'+(W-pad)+'" y2="'+Y(0)+'" stroke="#26303d" stroke-dasharray="3 3"/><path d="'+area+'" fill="url(#ag)"/><path d="'+line+'" fill="none" stroke="#34d399" stroke-width="2"/>'+labels+'</svg>';
+}
+
+// ── 렌더 ──
+function render(){
+  var c=compute(), prof=RISK[S.profile];
+  // 자산유형별
+  var typeAcc={stock:0,ETF:0,cash:0};
+  S.positions.forEach(function(p){typeAcc[p.assetType]=(typeAcc[p.assetType]||0)+(c.A[p.id].mv||0);});
+  var byType=Object.keys(typeAcc).filter(function(k){return typeAcc[k]>0;}).map(function(k){return {name:TYPE_LABEL[k],key:k,value:typeAcc[k],weight:c.total>0?typeAcc[k]/c.total*100:0,color:TYPE_COLOR[k]};});
+  // 종목 비중 파이
+  var wData=S.positions.filter(function(p){return c.A[p.id].mv>0;}).map(function(p,i){return {name:p.ticker||"?",value:c.A[p.id].mv,color:PIE[i%PIE.length]};});
+  // 수익률 바
+  var rData=S.positions.filter(function(p){return p.assetType!=="cash";}).map(function(p){return {name:p.ticker||"?",roi:+(c.A[p.id].roi||0).toFixed(1)};});
+  // 손익추이
+  var trend=S.snaps.map(function(s){return {date:s.date.slice(5),pnl:Math.round(s.totalPnl)};});
+  var td=today().slice(5); if(!trend.some(function(t){return t.date===td;}))trend.push({date:td,pnl:Math.round(c.pnl)});
+  // 경고
+  var warns=[];
+  S.positions.forEach(function(p){var a=c.A[p.id]; if(p.assetType==="cash")return;
+    if(a.weight>=30)warns.push({t:"danger",m:p.ticker+" 비중이 "+a.weight.toFixed(1)+"%로 높습니다 (집중 리스크)."});
+    var pr=priceOf(p); if(num(p.stop)>0&&pr>0){var ds=(pr-num(p.stop))/pr*100; if(ds>=0&&ds<5)warns.push({t:"amber",m:p.ticker+" 손절가까지 "+ds.toFixed(1)+"% — 근접 경고."});}
+    if(a.roi<=-10)warns.push({t:"amber",m:p.ticker+" 손실 "+a.roi.toFixed(1)+"% — 손실 확대 주의."});});
+  if(S.profile==="conservative"&&(100-c.cashW)>80)warns.push({t:"amber",m:"보수적 성향 대비 위험자산 비중("+(100-c.cashW).toFixed(0)+"%)이 높습니다."});
+
+  // 상태줄 메시지
+  var st=S.loading?"현재가 불러오는 중…":
+    (S.meta&&S.meta.mode==="static"&&S.meta.updatedAt)?'📡 현재가 자동 갱신: <b class="up">'+esc(S.meta.updatedAt)+'</b> · 매일 아침 자동 업데이트 · 성공 '+(S.meta.okCount!=null?S.meta.okCount+'/'+S.meta.count:''):
+    (S.meta&&S.meta.mode==="static")?'📁 현재가 데이터 사용 중 · 매일 아침 자동 갱신':
+    (S.meta&&S.meta.mode==="live")?'📡 <b class="up">실시간</b> 연동 중':
+    '<span style="color:#fbbf24">⚠ 현재가 데이터를 찾지 못했습니다. 종목별 현재가를 직접 입력하세요. (사이트 업로드 후엔 매일 아침 자동 갱신)</span>';
+
+  var rows=S.positions.map(function(p){
+    var a=c.A[p.id], pr=priceOf(p), fe=fetched(p), sy=sym(p.currency);
+    var priceCell=p.assetType==="cash"?'<span class="muted">-</span>':
+      fe?'<span class="up num">'+sy+fmt(pr,p.currency==="USD"?2:0)+'</span>':
+      '<input class="in-md num" style="border-color:rgba(251,191,36,.5);color:#fbbf24" type="number" placeholder="직접입력" value="'+esc(p.manualPrice)+'" oninput="upd(\''+p.id+'\',\'manualPrice\',this.value)">';
+    return '<tr>'+
+      '<td><input class="in-tk num" value="'+esc(p.ticker)+'" placeholder="AAPL" oninput="upd(\''+p.id+'\',\'ticker\',this.value)"></td>'+
+      '<td><select onchange="upd(\''+p.id+'\',\'assetType\',this.value)"><option value="stock"'+(p.assetType==="stock"?" selected":"")+'>주식</option><option value="ETF"'+(p.assetType==="ETF"?" selected":"")+'>ETF</option><option value="cash"'+(p.assetType==="cash"?" selected":"")+'>현금</option></select></td>'+
+      '<td><input class="in-sm num" type="number" value="'+esc(p.qty)+'" oninput="upd(\''+p.id+'\',\'qty\',this.value)"></td>'+
+      '<td><input class="in-md num" type="number" value="'+esc(p.avg)+'" oninput="upd(\''+p.id+'\',\'avg\',this.value)"></td>'+
+      '<td>'+priceCell+'</td>'+
+      '<td><input class="in-md num" type="number" value="'+esc(p.target)+'" oninput="upd(\''+p.id+'\',\'target\',this.value)"></td>'+
+      '<td><input class="in-md num" type="number" value="'+esc(p.stop)+'" oninput="upd(\''+p.id+'\',\'stop\',this.value)"></td>'+
+      '<td class="num" style="color:'+(a.roi>=0?"#34d399":"#fb7185")+'">'+(p.assetType==="cash"?"-":pct(a.roi))+'</td>'+
+      '<td class="num">'+(a.weight||0).toFixed(1)+'%</td>'+
+      '<td class="num">'+(a.rr!=null?a.rr.toFixed(2):"-")+'</td>'+
+      '<td><span class="pill" style="background:'+TONE[a.tone].bg+';color:'+TONE[a.tone].fg+'">'+TONE[a.tone].label+'</span></td>'+
+      '<td><span style="color:#38bdf8;cursor:pointer;padding:0 4px" onclick="openSim(\''+p.id+'\')">⚙</span><span style="color:#fb7185;cursor:pointer;padding:0 4px" onclick="del(\''+p.id+'\')">✕</span></td>'+
+    '</tr>';
+  }).join("");
+  if(S.positions.length===0)rows='<tr><td colspan="12" class="muted" style="text-align:center;padding:24px">보유 종목을 추가하세요.</td></tr>';
+
+  // 매수/매도 제안
+  var actionable=S.positions.filter(function(p){return p.assetType!=="cash"&&["buy","trim","danger"].indexOf(c.A[p.id].tone)>=0;});
+  var adviceHTML=actionable.length===0?'<p class="muted" style="font-size:13px">현재 액션 권장 종목이 없습니다. (전체 관망/보유)</p>':
+    actionable.map(function(p){var a=c.A[p.id],sy=sym(p.currency);
+      var ex=a.tone==="buy"?
+        '<div>1차 매수가 <b class="up">'+sy+fmt(a.buy1,p.currency==="USD"?2:0)+'</b></div><div>2차 매수가 <b class="up">'+sy+fmt(a.buy2,p.currency==="USD"?2:0)+'</b></div><div style="grid-column:1/3">권장 매수금액 <b class="up">'+fmt(a.recBuy)+'</b></div>':
+        (a.recSell>0?'<div style="grid-column:1/3">권장 매도금액 <b style="color:#fbbf24">'+fmt(a.recSell)+'</b></div>':"");
+      return '<div class="advice" style="background:'+TONE[a.tone].bg+'"><div class="top"><b class="num">'+esc(p.ticker)+'</b><span class="pill" style="background:rgba(0,0,0,.2);color:'+TONE[a.tone].fg+'">'+TONE[a.tone].label+'</span></div>'+
+        '<div class="grid2"><div>수익률 <b style="color:'+(a.roi>=0?"#34d399":"#fb7185")+'">'+pct(a.roi)+'</b></div><div>비중 <b>'+a.weight.toFixed(1)+'%</b></div><div>상승여력 <b>'+(a.upside!=null?pct(a.upside):"-")+'</b></div><div>손익비 <b>'+(a.rr!=null?a.rr.toFixed(2):"-")+'</b></div>'+ex+'</div>'+
+        '<div class="reason" style="color:'+TONE[a.tone].fg+'">'+esc(a.reasons.join(" "))+'</div></div>';
+    }).join("");
+
+  // 시뮬레이터
+  var simHTML=simBlock(c);
+
+  var app=
+  '<header><div class="wrap hd">'+
+    '<div class="row"><div>'+
+      '<div style="display:flex;gap:8px;align-items:center"><span class="brand">에스아이 스토리</span><span class="badge">PORTFOLIO</span></div>'+
+      '<h1>내 <em>포트폴리오</em> 운영 시스템</h1>'+
+      '<div class="sub">보유 수량·평단가를 입력하면 현재가가 자동 연동되어 수익률·리스크·매수/매도 타이밍을 분석합니다.</div>'+
+    '</div><div>'+
+      '<select onchange="setProfile(this.value)">'+Object.keys(RISK).map(function(k){return '<option value="'+k+'"'+(S.profile===k?" selected":"")+'>투자성향: '+RISK[k].label+'</option>';}).join("")+'</select>'+
+    '</div></div>'+
+    '<div class="status"><span>'+st+'</span>'+(S.savedAt?'<span>· 💾 마지막 저장: <b>'+esc(S.savedAt)+'</b></span>':"")+'<span style="margin-left:auto"><button class="btn-ghost" style="font-size:12px;padding:4px 10px" onclick="loadPrices()">↻ 현재가 새로고침</button></span></div>'+
+  '</div></header>'+
+  '<main><div class="wrap">'+
+    '<div class="stats">'+
+      stat("전체 자산 (평가금액)",fmt(c.total),"보유 종목 시가 합계","")+
+      stat("총 수익률",pct(c.roi),"평단 대비",c.roi>=0?"up":"down")+
+      stat("총 평가손익",(c.pnl>=0?"+":"")+fmt(c.pnl),"평가금액 - 매입원가",c.pnl>=0?"up":"down")+
+      stat("현금 비중",c.cashW.toFixed(1)+"%","전체 자산 중","")+
+    '</div>'+
+    '<div class="grid3"><div class="colL">'+
+      '<section class="card pad"><div class="row" style="margin-bottom:12px"><div class="sec-title">보유 <em>종목</em></div>'+
+        '<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-primary" onclick="saveToday()">오늘 데이터 저장</button><button class="btn-ghost" onclick="loadYesterday()">어제 데이터 불러오기</button><button class="btn-danger" onclick="resetAll()">초기화</button></div></div>'+
+        '<div style="overflow-x:auto"><table><thead><tr>'+["티커","유형","수량","평단가","현재가","목표가","손절가","수익률","비중","손익비","AI 판단",""].map(function(h){return "<th>"+h+"</th>";}).join("")+'</tr></thead><tbody>'+rows+'</tbody></table></div>'+
+        '<button class="btn-ghost add-btn" onclick="addRow()">+ 종목 추가</button></section>'+
+      '<section class="charts">'+
+        '<div class="card pad chart-box"><h3>종목별 <em>비중</em></h3>'+pieSVG(wData,180)+'</div>'+
+        '<div class="card pad chart-box"><h3>자산유형별 <em>비중</em></h3>'+pieSVG(byType,180)+'</div>'+
+        '<div class="card pad chart-box"><h3>종목별 <em>수익률</em></h3>'+barSVG(rData)+'</div>'+
+        '<div class="card pad chart-box"><h3>손익 <em>추이</em></h3>'+areaSVG(trend)+(trend.length<2?'<p class="muted" style="font-size:11px;text-align:center;margin-top:4px">"오늘 데이터 저장"을 매일 누르면 추이가 쌓입니다.</p>':"")+'</div>'+
+      '</section>'+
+    '</div><div class="colR">'+
+      '<section class="card pad"><div class="sec-title">리스크 <em>경고</em></div>'+
+        (warns.length===0?'<p class="up" style="font-size:13px">⚠ 현재 특별한 경고가 없습니다.</p>':warns.map(function(w){return '<div class="warn" style="background:'+(w.t==="danger"?"#3d1620":"#3a2f12")+'"><span style="color:'+(w.t==="danger"?"#fb7185":"#fbbf24")+'">●</span><span style="color:'+(w.t==="danger"?"#fda4af":"#fde68a")+'">'+esc(w.m)+'</span></div>';}).join(""))+
+        '<div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--line)"><div class="muted" style="font-size:12px;margin-bottom:8px">자산유형별 비중</div>'+
+        byType.map(function(t){return '<div class="legend"><span style="width:34px;color:'+t.color+'">'+t.name+'</span><span class="bar-track"><span class="bar-fill" style="width:'+t.weight+'%;background:'+t.color+'"></span></span><span class="num" style="width:48px;text-align:right">'+t.weight.toFixed(1)+'%</span></div>';}).join("")+'</div></section>'+
+      '<section class="card pad"><div class="sec-title">매수 · 매도 <em>제안</em></div>'+adviceHTML+'</section>'+
+      '<section class="card pad"><div class="sec-title">추가매수 <em>시뮬레이터</em></div>'+simHTML+'</section>'+
+    '</div></div>'+
+    '<div class="footer">본 분석은 사용자가 입력한 데이터와 규칙 기반 계산에 따른 참고용 정보이며,<br>실제 투자 판단과 책임은 투자자 본인에게 있습니다.</div>'+
+  '</div></main>';
+  document.getElementById("app").innerHTML=app;
+}
+
+function stat(lbl,val,sub,tone){var col=tone==="up"?"#34d399":tone==="down"?"#fb7185":"#e6edf5";
+  return '<div class="card pad stat"><div class="lbl">'+lbl+'</div><div class="val num" style="color:'+col+'">'+val+'</div><div class="sub2">'+sub+'</div></div>';}
+
+function simBlock(c){
+  var opts='<option value="">종목 선택…</option>'+S.positions.filter(function(p){return p.assetType!=="cash";}).map(function(p){return '<option value="'+p.id+'"'+(S.sim.id===p.id?" selected":"")+'>'+esc(p.ticker||p.name)+'</option>';}).join("");
+  var html='<select onchange="openSim(this.value)" style="width:100%;margin-bottom:12px">'+opts+'</select>';
+  var p=S.positions.filter(function(x){return x.id===S.sim.id;})[0];
+  if(!p)return html+'<p class="muted" style="font-size:13px">종목을 선택하면 추가매수 후 평단가·비중·수익률 변화를 계산합니다.</p>';
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">'+
+    '<div><div class="muted" style="font-size:12px;margin-bottom:4px">추가 매수 수량</div><input class="num" style="width:100%" type="number" value="'+esc(S.sim.addQty)+'" oninput="S.sim.addQty=this.value;render()"></div>'+
+    '<div><div class="muted" style="font-size:12px;margin-bottom:4px">추가 매수 가격</div><input class="num" style="width:100%" type="number" value="'+esc(S.sim.addPrice)+'" oninput="S.sim.addPrice=this.value;render()"></div></div>';
+  var addQty=num(S.sim.addQty),addPrice=num(S.sim.addPrice);
+  if(addQty>0){
+    var cur=priceOf(p),oq=num(p.qty),oa=num(p.avg),nq=oq+addQty,na=(oq*oa+addQty*addPrice)/nq;
+    var nmv=nq*cur,ntot=c.total-oq*cur+nmv,nw=ntot>0?nmv/ntot*100:0;
+    var or=oa>0?(cur-oa)/oa*100:0,nr=na>0?(cur-na)/na*100:0,ow=c.total>0?oq*cur/c.total*100:0,sy=sym(p.currency);
+    html+='<div style="background:var(--panel2);border-radius:12px;padding:12px">'+
+      simrow("변경 후 평단가",sy+fmt(na,p.currency==="USD"?2:0))+
+      simrow("변경 후 비중",ow.toFixed(1)+"% → "+nw.toFixed(1)+"%")+
+      simrow("예상 수익률",pct(or)+" → "+pct(nr),nr>=0?"#34d399":"#fb7185")+
+      simrow("변경 후 수량",fmt(nq))+'</div>';
+  }
+  return html;
+}
+function simrow(k,v,col){return '<div class="simrow"><span class="k">'+k+'</span><span class="num" style="font-weight:700;color:'+(col||"#e6edf5")+'">'+v+'</span></div>';}
+
+// ── 이벤트 핸들러 (전역) ──
+function upd(id,field,val){
+  S.positions=S.positions.map(function(p){
+    if(p.id!==id)return p;
+    var np={}; for(var k in p)np[k]=p[k]; np[field]=val;
+    if(field==="ticker"){var t=val.trim().toUpperCase();var r=S.prices[t];if(r){np.name=r.name;np.assetType=r.assetType;np.currency=r.currency;}}
+    return np;
+  });
+  persist();
+  if(field==="ticker"){clearTimeout(window._tkT);window._tkT=setTimeout(loadPrices,600);}
+  render();
+}
+function addRow(){S.positions.push({id:uid(),ticker:"",name:"",assetType:"stock",currency:"USD",qty:"",avg:"",target:"",stop:"",memo:"",manualPrice:""});persist();render();}
+function del(id){S.positions=S.positions.filter(function(p){return p.id!==id;});if(S.sim.id===id)S.sim={id:null,addQty:"",addPrice:""};persist();render();}
+function setProfile(v){S.profile=v;persist();render();}
+function openSim(id){var p=S.positions.filter(function(x){return x.id===id;})[0];S.sim={id:id||null,addQty:"",addPrice:p?String(priceOf(p)||""):""};render();}
+function saveProxy(){var v=(S.proxyInput||"").trim().replace(/\/+$/,"");S.proxy=v;if(v)localStorage.setItem(LS_PROXY,v);else localStorage.removeItem(LS_PROXY);loadPrices();}
+function saveToday(){
+  persist();
+  var d=today();S.snaps=S.snaps.filter(function(s){return s.date!==d;});
+  var c=compute();S.snaps.push({date:d,totalValue:c.total,totalPnl:c.pnl,totalCost:c.totalCost});S.snaps=S.snaps.slice(-60);
+  localStorage.setItem(LS_SNAP,JSON.stringify(S.snaps));
+  alert("오늘 데이터가 저장되었습니다.\n"+S.savedAt);render();
+}
+function loadYesterday(){try{var raw=localStorage.getItem(LS_KEY);if(raw){var d=JSON.parse(raw);S.positions=d.positions||[];S.profile=d.profile||"moderate";alert("저장된 데이터를 불러왔습니다.\n마지막 저장: "+(d.savedAt||"-"));loadPrices();}else alert("저장된 데이터가 없습니다.");}catch(e){alert("불러오기 실패");}}
+function resetAll(){if(!confirm("모든 보유 종목을 초기화할까요? (손익추이 스냅샷은 유지)"))return;S.positions=[];localStorage.removeItem(LS_KEY);S.savedAt=null;render();}
+
+// ── 시작 ──
+restore();
+render();
+loadPrices();
+
+
+</script>
+</body>
+</html>

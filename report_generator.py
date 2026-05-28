@@ -936,6 +936,119 @@ def render_template(template_name: str, **kwargs) -> str:
 
 
 # ============================================================
+#  포트폴리오 현재가 수집 (portfolio_prices.json 생성)
+#  - my_tickers.txt 에 적힌 보유 종목의 현재가를 yfinance로 수집
+#  - 기존 리포트 빌드와 함께 매일 새벽 자동 실행됨
+#  - 조회 실패 종목은 priceFetched=false → 프론트에서 직접 입력 폴백
+# ============================================================
+
+def _classify_asset_type(ticker: str, info: dict) -> str:
+    if ticker.upper() in ("CASH", "현금", "KRW", "USD"):
+        return "cash"
+    qt = str((info or {}).get("quoteType", "")).upper()
+    if qt == "ETF":
+        return "ETF"
+    if qt in ("EQUITY", "STOCK"):
+        return "stock"
+    if qt == "MUTUALFUND":
+        return "ETF"
+    return "stock"
+
+
+def _fetch_portfolio_one(ticker: str) -> dict:
+    rec = {
+        "ticker": ticker, "name": ticker, "assetType": "stock", "currency": "USD",
+        "currentPrice": None, "previousClose": None, "changePercent": None,
+        "priceFetched": False, "error": None,
+    }
+    if ticker.upper() in ("CASH", "현금", "KRW", "USD"):
+        rec.update({"name": "현금", "assetType": "cash", "currentPrice": 1,
+                    "previousClose": 1, "changePercent": 0.0, "priceFetched": True})
+        return rec
+    try:
+        tk = yf.Ticker(ticker)
+        price = prev = None
+        try:
+            fi = tk.fast_info
+            price = getattr(fi, "last_price", None)
+            prev = getattr(fi, "previous_close", None)
+        except Exception:
+            pass
+        info = {}
+        try:
+            info = tk.info or {}
+        except Exception:
+            info = {}
+        if price is None:
+            hist = tk.history(period="5d")
+            if not hist.empty:
+                price = float(hist["Close"].iloc[-1])
+                if len(hist) >= 2:
+                    prev = float(hist["Close"].iloc[-2])
+        if price is None:
+            rec["error"] = "no_price_data"
+            return rec
+        price = float(price)
+        prev = float(prev) if prev else price
+        change = ((price - prev) / prev * 100.0) if prev else 0.0
+        cur = info.get("currency") or ("KRW" if ticker.upper().endswith((".KS", ".KQ")) else "USD")
+        rec.update({
+            "name": info.get("shortName") or info.get("longName") or ticker,
+            "assetType": _classify_asset_type(ticker, info),
+            "currency": cur,
+            "currentPrice": round(price, 4),
+            "previousClose": round(prev, 4),
+            "changePercent": round(change, 2),
+            "priceFetched": True,
+        })
+        return rec
+    except Exception as e:
+        rec["error"] = f"{type(e).__name__}"
+        return rec
+
+
+def generate_portfolio_prices(output_dir: Path) -> None:
+    """my_tickers.txt 의 보유 종목 현재가를 portfolio_prices.json 으로 저장."""
+    kst = timezone(timedelta(hours=9))
+    tickers_file = Path(__file__).parent / "my_tickers.txt"
+    if not tickers_file.exists():
+        log.info("my_tickers.txt 없음 — 포트폴리오 시세 생략")
+        return
+    tickers = []
+    for line in tickers_file.read_text(encoding="utf-8").splitlines():
+        t = line.strip().upper()
+        if t and not t.startswith("#"):
+            tickers.append(t)
+    if not tickers:
+        log.info("my_tickers.txt 비어있음 — 포트폴리오 시세 생략")
+        return
+
+    log.info("포트폴리오 현재가 수집: %d 종목", len(tickers))
+    prices, ok = [], 0
+    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as ex:
+        futures = {ex.submit(_fetch_portfolio_one, t): t for t in tickers}
+        for fut in as_completed(futures):
+            r = fut.result()
+            prices.append(r)
+            if r["priceFetched"]:
+                ok += 1
+    # 원래 입력 순서 유지
+    order = {t: i for i, t in enumerate(tickers)}
+    prices.sort(key=lambda r: order.get(r["ticker"].upper(), 999))
+
+    payload = {
+        "updatedAt": datetime.now(kst).strftime("%Y-%m-%d %H:%M:%S"),
+        "timezone": "Asia/Seoul",
+        "source": "Yahoo Finance (yfinance)",
+        "count": len(prices), "okCount": ok, "failCount": len(prices) - ok,
+        "prices": prices,
+    }
+    out = output_dir / "portfolio_prices.json"
+    out.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    log.info("  ✓ portfolio_prices.json (성공 %d/%d)", ok, len(prices))
+
+
+# ============================================================
 #  메인 흐름
 # ============================================================
 
@@ -1139,6 +1252,12 @@ def main() -> int:
     kr_path = args.output_dir / "korea_premium_report.html"
     kr_path.write_text(kr_prem_html, encoding='utf-8')
     log.info("  ✓ %s (%d bytes)", kr_path.name, kr_path.stat().st_size)
+
+    # 11-4 포트폴리오 현재가 (my_tickers.txt 보유 종목)
+    try:
+        generate_portfolio_prices(args.output_dir)
+    except Exception as e:
+        log.warning("포트폴리오 시세 생성 실패(무시하고 계속): %s", e)
 
     log.info("=" * 60)
     log.info("  완료. 미국 %d/%d, 한국 %d/%d, 미국 펀더멘털 %d개",
