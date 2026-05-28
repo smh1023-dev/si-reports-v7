@@ -191,7 +191,7 @@ LLM_PROMPT_TEMPLATE = """당신은 Damodaran 스타일의 가치투자 애널리
 섹터: {sector}
 {extra}
 
-5가지 항목을 다음 JSON 형식으로만 답변하세요. 다른 텍스트는 절대 금지.
+6가지 항목을 다음 JSON 형식으로만 답변하세요. 다른 텍스트는 절대 금지.
 각 항목은 한국어로 작성하고, 구체적 사업/제품/경쟁사를 언급하세요.
 
 {{
@@ -199,8 +199,15 @@ LLM_PROMPT_TEMPLATE = """당신은 Damodaran 스타일의 가치투자 애널리
   "moat": "경제적 해자 한 문장(80-120자). 네트워크 효과/브랜드/전환비용/데이터/규모/특허 중 무엇인지 명시. 예: '30억+ 사용자 네트워크 효과와 광고주 데이터 락인으로 디지털 광고 시장 과점 구조'",
   "risk": "주요 리스크 요인 한 문장(80-120자). 규제·경쟁·기술변화·매크로 등 구체적으로. 예: 'EU/미국 빅테크 규제 강화와 TikTok 등 SNS 경쟁 심화가 광고 단가 하방 압력으로 작용'",
   "megatrend": "AI·데이터센터·플랫폼·네트워크효과·전기차·바이오 등 메가트렌드 관련성 한 문장(80-120자). 예: 'AI 학습 인프라(GPU)와 추천 알고리즘 자체 개발로 AI 인프라+서비스 양면 수혜'",
-  "thesis": "Damodaran 스타일 한 줄 투자 논리(60-100자). 가치/성장/리스크 균형 관점. 예: 'AI 광고 효율 + 메타버스 옵션 가치를 합쳐 PEG 대비 저평가, 단 규제 리스크 모니터링 필수'"
-}}"""
+  "thesis": "Damodaran 스타일 한 줄 투자 논리(60-100자). 가치/성장/리스크 균형 관점. 예: 'AI 광고 효율 + 메타버스 옵션 가치를 합쳐 PEG 대비 저평가, 단 규제 리스크 모니터링 필수'",
+  "suppliers": [
+    {{"name": "협력사명 (티커)", "reason": "이 회사에 무엇을 납품하는지 한 줄(30-50자)"}},
+    {{"name": "협력사명 (티커)", "reason": "납품 내용 한 줄"}}
+  ]
+}}
+
+suppliers는 이 종목({name})에 부품·소재·서비스를 납품하는 '상장된' 대표 협력사 2~3개입니다.
+반드시 실제로 상장된 회사만, 티커를 괄호 안에 표기하세요. 확실하지 않으면 적게 넣으세요. 추측성 종목은 절대 넣지 마세요."""
 
 
 def call_llm_for_stock(client, ticker: str, name: str, sector: str,
@@ -245,12 +252,24 @@ def call_llm_for_stock(client, ticker: str, name: str, sector: str,
         if not all(k in data for k in required):
             return None
 
+        # 협력사 파싱 (선택 항목, 최대 3개)
+        suppliers = []
+        raw_sup = data.get('suppliers', [])
+        if isinstance(raw_sup, list):
+            for s in raw_sup[:3]:
+                if isinstance(s, dict) and s.get('name'):
+                    suppliers.append({
+                        'name': str(s.get('name', ''))[:60],
+                        'reason': str(s.get('reason', ''))[:120],
+                    })
+
         return {
             'growth': str(data['growth'])[:300],
             'moat': str(data['moat'])[:300],
             'risk': str(data['risk'])[:300],
             'megatrend': str(data['megatrend'])[:300],
             'thesis': str(data['thesis'])[:250],
+            'suppliers': suppliers,
         }
     except Exception as e:
         log.warning("LLM 실패 %s: %s", ticker, e)
@@ -271,6 +290,7 @@ def _fallback_story(ticker: str, name: str, sector: str,
             'risk': f"[{sector}] 산업 사이클, 경쟁 강도, 규제 환경 변화에 따른 변동성",
             'megatrend': "산업별 메가트렌드 관련성은 별도 검토 필요",
             'thesis': f"[{sector}] 산업 평균 동인. 종목별 차별화 요인 검토 후 진입 판단 필요.",
+            'suppliers': [],
         }
     return {
         'growth': f"[{sector or '기타'}] 산업 트렌드에 따라 상이",
@@ -278,6 +298,7 @@ def _fallback_story(ticker: str, name: str, sector: str,
         'risk': "산업 평균 리스크 적용",
         'megatrend': "별도 검토 필요",
         'thesis': "산업 평균 - 종목별 분석 후 판단 필요",
+        'suppliers': [],
     }
 
 
@@ -328,9 +349,10 @@ def build_stories(rows: list[dict], sector_db: dict,
                 'risk': cached.get('risk', cached.get('moat', '')),
                 'megatrend': cached.get('megatrend', ''),
                 'thesis': cached.get('thesis', ''),
+                'suppliers': cached.get('suppliers', []),
             }
-            # 구버전 캐시 호환
-            if not cached.get('risk') or not cached.get('megatrend'):
+            # 구버전 캐시 호환 (협력사 항목 없으면 새로 호출)
+            if not cached.get('risk') or not cached.get('megatrend') or 'suppliers' not in cached:
                 # 새 형식으로 재호출 필요
                 cached = None
 
@@ -375,6 +397,7 @@ def build_stories(rows: list[dict], sector_db: dict,
             'risk': llm_part.get('risk', ''),
             'megatrend': llm_part.get('megatrend', ''),
             'thesis': llm_part.get('thesis', ''),
+            'suppliers': llm_part.get('suppliers', []),
             'risk_change': risk_change,
             'valuation': valuation,
         }
