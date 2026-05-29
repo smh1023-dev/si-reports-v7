@@ -749,8 +749,14 @@ def compute_allocation(vix: float | None) -> dict:
 # ============================================================
 
 def render_kakao_message(date_str: str, market_grp: dict, us_top3: list[dict], kr_top3: list[dict],
-                          allocation: dict) -> str:
-    """카카오톡 발송용 500자 내외 요약."""
+                          allocation: dict, us_top10: list[dict] = None, kr_top10: list[dict] = None,
+                          stories: dict = None) -> str:
+    """카카오톡 발송용 요약. TOP3 없으면 TOP10 상위 3개로 대체, Damodaran 해자·논리 포함."""
+    stories = stories or {}
+    # TOP3 있으면 TOP3, 없으면 TOP10 상위 3개
+    us_picks = us_top3 if us_top3 else (us_top10 or [])[:3]
+    kr_picks = kr_top3 if kr_top3 else (kr_top10 or [])[:3]
+
     sp = next((m for m in market_grp.get('us_index', []) if m['ticker'] == '^GSPC'), None)
     ks = next((m for m in market_grp.get('kr_index', []) if m['ticker'] == '^KS11'), None)
     vix = next((m for m in market_grp.get('macro', []) if m['ticker'] == '^VIX'), None)
@@ -766,20 +772,34 @@ def render_kakao_message(date_str: str, market_grp: dict, us_top3: list[dict], k
     if vix:
         lines.append(f"• VIX: {vix['value_str']}")
 
-    lines.append("")
-    if us_top3:
-        lines.append("🇺🇸 미국 관심종목 TOP 3")
-        for i, r in enumerate(us_top3, 1):
-            lines.append(f"  {i}. {r['ticker']} ({r.get('name','')[:20]}) — {r['combined_score']:.0f}점")
-    if kr_top3:
-        lines.append("🇰🇷 한국 관심종목 TOP 3")
-        for i, r in enumerate(kr_top3, 1):
-            lines.append(f"  {i}. {r['ticker']} ({r.get('name','')[:20]}) — {r['combined_score']:.0f}점")
+    def stock_block(r):
+        st = stories.get(r['ticker'], {})
+        blk = [f"  {r['ticker']} ({r.get('name','')[:20]}) — {r['combined_score']:.0f}점"]
+        if st.get('thesis'):
+            blk.append(f"   📖 {st['thesis']}")
+        if st.get('moat'):
+            blk.append(f"   🛡️ 해자: {st['moat']}")
+        sup = st.get('suppliers') or []
+        if sup:
+            names = ', '.join(s.get('name','') for s in sup[:3])
+            blk.append(f"   🔗 협력사: {names}")
+        return blk
 
     lines.append("")
+    if us_picks:
+        lines.append("🇺🇸 미국 관심종목 TOP 3" if us_top3 else "🇺🇸 미국 상위 후보 3")
+        for r in us_picks:
+            lines.extend(stock_block(r))
+            lines.append("")
+    if kr_picks:
+        lines.append("🇰🇷 한국 관심종목 TOP 3" if kr_top3 else "🇰🇷 한국 상위 후보 3")
+        for r in kr_picks:
+            lines.extend(stock_block(r))
+            lines.append("")
+
     lines.append(f"💰 자산배분: 주식 {allocation['stock']}% / 금 {allocation['gold']}% / 현금 {allocation['cash']}%")
     lines.append("")
-    lines.append("※ 본 정보는 투자 참고용입니다.")
+    lines.append("※ 본 정보는 투자 참고용입니다. 협력사는 AI 추정으로 부정확할 수 있습니다.")
 
     return '\n'.join(lines)
 
@@ -787,8 +807,12 @@ def render_kakao_message(date_str: str, market_grp: dict, us_top3: list[dict], k
 def render_blog_post(date_str: str, market_grp: dict, market_interpret: str,
                      us_top10: list[dict], kr_top10: list[dict],
                      us_top3: list[dict], kr_top3: list[dict],
-                     allocation: dict) -> str:
-    """블로그 업로드용 마크다운."""
+                     allocation: dict, stories: dict = None) -> str:
+    """블로그 업로드용 마크다운. TOP3 없으면 TOP10 상위 3개, Damodaran 분석 포함."""
+    stories = stories or {}
+    us_picks = us_top3 if us_top3 else (us_top10 or [])[:3]
+    kr_picks = kr_top3 if kr_top3 else (kr_top10 or [])[:3]
+
     sp = next((m for m in market_grp.get('us_index', []) if m['ticker'] == '^GSPC'), None)
     ks = next((m for m in market_grp.get('kr_index', []) if m['ticker'] == '^KS11'), None)
 
@@ -809,25 +833,47 @@ def render_blog_post(date_str: str, market_grp: dict, market_interpret: str,
             lines.append(f"| 코스피 | {ks['value_str']} | {'+' if ks['change_pct']>=0 else ''}{ks['change_pct']:.2f}% |")
         lines.append("")
 
-    lines.append("## 미국 관심 종목 TOP 3")
+    def stock_section(r):
+        st = stories.get(r['ticker'], {})
+        sec = [
+            f"### {r['ticker']} — {r.get('name','')}",
+            "",
+            f"- **종합 점수**: {r['combined_score']:.0f}점",
+        ]
+        if st.get('thesis'):
+            sec.append(f"- **📖 Damodaran 투자 논리**: {st['thesis']}")
+        if st.get('moat'):
+            sec.append(f"- **🛡️ 해자 (Moat)**: {st['moat']}")
+        if st.get('growth'):
+            sec.append(f"- **📈 성장 동인**: {st['growth']}")
+        if st.get('risk'):
+            sec.append(f"- **⚠️ 리스크 요인**: {st['risk']}")
+        if st.get('megatrend'):
+            sec.append(f"- **🚀 메가트렌드**: {st['megatrend']}")
+        sup = st.get('suppliers') or []
+        if sup:
+            names = ' / '.join(f"{s.get('name','')} ({s.get('reason','')})" for s in sup[:3])
+            sec.append(f"- **🔗 대표 협력사**: {names}")
+        if not st.get('thesis') and r.get('damodaran'):
+            sec.append(f"- 스토리: {r.get('damodaran','')}")
+        sec.append("")
+        return sec
+
+    us_title = "## 미국 관심 종목 TOP 3" if us_top3 else "## 미국 상위 후보 TOP 3"
+    lines.append(us_title)
     lines.append("")
-    if us_top3:
-        for i, r in enumerate(us_top3, 1):
-            lines.append(f"**{i}. {r['ticker']} — {r.get('name','')}**")
-            lines.append(f"  - 종합 점수: {r['combined_score']:.0f}점")
-            lines.append(f"  - 스토리: {r.get('damodaran','')}")
-            lines.append("")
+    if us_picks:
+        for r in us_picks:
+            lines.extend(stock_section(r))
     else:
         lines.append("_오늘은 조건을 충족하는 종목이 없습니다._\n")
 
-    lines.append("## 한국 관심 종목 TOP 3")
+    kr_title = "## 한국 관심 종목 TOP 3" if kr_top3 else "## 한국 상위 후보 TOP 3"
+    lines.append(kr_title)
     lines.append("")
-    if kr_top3:
-        for i, r in enumerate(kr_top3, 1):
-            lines.append(f"**{i}. {r['ticker']} — {r.get('name','')}**")
-            lines.append(f"  - 종합 점수: {r['combined_score']:.0f}점")
-            lines.append(f"  - 스토리: {r.get('damodaran','')}")
-            lines.append("")
+    if kr_picks:
+        for r in kr_picks:
+            lines.extend(stock_section(r))
     else:
         lines.append("_오늘은 조건을 충족하는 종목이 없습니다._\n")
 
@@ -841,7 +887,7 @@ def render_blog_post(date_str: str, market_grp: dict, market_interpret: str,
     lines.append("")
     lines.append("---")
     lines.append("")
-    lines.append("> **투자 유의사항**: 본 자료는 공개 시장 데이터 기반의 투자 참고용 정보로, 특정 종목의 매수·매도를 권유하지 않습니다. 투자 판단과 손익 책임은 전적으로 투자자 본인에게 있습니다.")
+    lines.append("> **투자 유의사항**: 본 자료는 공개 시장 데이터 기반의 투자 참고용 정보로, 특정 종목의 매수·매도를 권유하지 않습니다. 협력사 정보는 AI 추정으로 부정확할 수 있습니다. 투자 판단과 손익 책임은 전적으로 투자자 본인에게 있습니다.")
 
     return '\n'.join(lines)
 
@@ -933,119 +979,6 @@ def render_template(template_name: str, **kwargs) -> str:
     template_dir = Path(__file__).parent / "templates"
     env = Environment(loader=FileSystemLoader(template_dir), autoescape=True)
     return env.get_template(template_name).render(**kwargs)
-
-
-# ============================================================
-#  포트폴리오 현재가 수집 (portfolio_prices.json 생성)
-#  - my_tickers.txt 에 적힌 보유 종목의 현재가를 yfinance로 수집
-#  - 기존 리포트 빌드와 함께 매일 새벽 자동 실행됨
-#  - 조회 실패 종목은 priceFetched=false → 프론트에서 직접 입력 폴백
-# ============================================================
-
-def _classify_asset_type(ticker: str, info: dict) -> str:
-    if ticker.upper() in ("CASH", "현금", "KRW", "USD"):
-        return "cash"
-    qt = str((info or {}).get("quoteType", "")).upper()
-    if qt == "ETF":
-        return "ETF"
-    if qt in ("EQUITY", "STOCK"):
-        return "stock"
-    if qt == "MUTUALFUND":
-        return "ETF"
-    return "stock"
-
-
-def _fetch_portfolio_one(ticker: str) -> dict:
-    rec = {
-        "ticker": ticker, "name": ticker, "assetType": "stock", "currency": "USD",
-        "currentPrice": None, "previousClose": None, "changePercent": None,
-        "priceFetched": False, "error": None,
-    }
-    if ticker.upper() in ("CASH", "현금", "KRW", "USD"):
-        rec.update({"name": "현금", "assetType": "cash", "currentPrice": 1,
-                    "previousClose": 1, "changePercent": 0.0, "priceFetched": True})
-        return rec
-    try:
-        tk = yf.Ticker(ticker)
-        price = prev = None
-        try:
-            fi = tk.fast_info
-            price = getattr(fi, "last_price", None)
-            prev = getattr(fi, "previous_close", None)
-        except Exception:
-            pass
-        info = {}
-        try:
-            info = tk.info or {}
-        except Exception:
-            info = {}
-        if price is None:
-            hist = tk.history(period="5d")
-            if not hist.empty:
-                price = float(hist["Close"].iloc[-1])
-                if len(hist) >= 2:
-                    prev = float(hist["Close"].iloc[-2])
-        if price is None:
-            rec["error"] = "no_price_data"
-            return rec
-        price = float(price)
-        prev = float(prev) if prev else price
-        change = ((price - prev) / prev * 100.0) if prev else 0.0
-        cur = info.get("currency") or ("KRW" if ticker.upper().endswith((".KS", ".KQ")) else "USD")
-        rec.update({
-            "name": info.get("shortName") or info.get("longName") or ticker,
-            "assetType": _classify_asset_type(ticker, info),
-            "currency": cur,
-            "currentPrice": round(price, 4),
-            "previousClose": round(prev, 4),
-            "changePercent": round(change, 2),
-            "priceFetched": True,
-        })
-        return rec
-    except Exception as e:
-        rec["error"] = f"{type(e).__name__}"
-        return rec
-
-
-def generate_portfolio_prices(output_dir: Path) -> None:
-    """my_tickers.txt 의 보유 종목 현재가를 portfolio_prices.json 으로 저장."""
-    kst = timezone(timedelta(hours=9))
-    tickers_file = Path(__file__).parent / "my_tickers.txt"
-    if not tickers_file.exists():
-        log.info("my_tickers.txt 없음 — 포트폴리오 시세 생략")
-        return
-    tickers = []
-    for line in tickers_file.read_text(encoding="utf-8").splitlines():
-        t = line.strip().upper()
-        if t and not t.startswith("#"):
-            tickers.append(t)
-    if not tickers:
-        log.info("my_tickers.txt 비어있음 — 포트폴리오 시세 생략")
-        return
-
-    log.info("포트폴리오 현재가 수집: %d 종목", len(tickers))
-    prices, ok = [], 0
-    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as ex:
-        futures = {ex.submit(_fetch_portfolio_one, t): t for t in tickers}
-        for fut in as_completed(futures):
-            r = fut.result()
-            prices.append(r)
-            if r["priceFetched"]:
-                ok += 1
-    # 원래 입력 순서 유지
-    order = {t: i for i, t in enumerate(tickers)}
-    prices.sort(key=lambda r: order.get(r["ticker"].upper(), 999))
-
-    payload = {
-        "updatedAt": datetime.now(kst).strftime("%Y-%m-%d %H:%M:%S"),
-        "timezone": "Asia/Seoul",
-        "source": "Yahoo Finance (yfinance)",
-        "count": len(prices), "okCount": ok, "failCount": len(prices) - ok,
-        "prices": prices,
-    }
-    out = output_dir / "portfolio_prices.json"
-    out.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
-    log.info("  ✓ portfolio_prices.json (성공 %d/%d)", ok, len(prices))
 
 
 # ============================================================
@@ -1183,17 +1116,33 @@ def main() -> int:
         us_stories = {}
         kr_stories = {}
 
-    # 10. 카카오 / 블로그 (프리미엄용)
-    us_kakao = render_kakao_message(date_str, market_grp, [prepare_row(r) for r in us_top3], [], allocation)
-    kr_kakao = render_kakao_message(date_str, market_grp, [], [prepare_row(r) for r in kr_top3], allocation)
+    # 10. 카카오 / 블로그 (프리미엄용) — stories와 top10도 함께 넘김 (TOP3 없으면 TOP10 폴백)
+    us_top10_rows = [prepare_row(r) for r in us_top10]
+    kr_top10_rows = [prepare_row(r) for r in kr_top10]
+    us_top3_rows  = [prepare_row(r) for r in us_top3]
+    kr_top3_rows  = [prepare_row(r) for r in kr_top3]
+    # 합친 stories (무료 페이지가 미국+한국 둘 다 쓰니까)
+    all_stories = {**us_stories, **kr_stories}
+
+    us_kakao = render_kakao_message(date_str, market_grp, us_top3_rows, [], allocation,
+                                     us_top10=us_top10_rows, stories=us_stories)
+    kr_kakao = render_kakao_message(date_str, market_grp, [], kr_top3_rows, allocation,
+                                     kr_top10=kr_top10_rows, stories=kr_stories)
     us_blog = render_blog_post(date_str, market_grp, market_interpret,
-                                [prepare_row(r) for r in us_top10], [],
-                                [prepare_row(r) for r in us_top3], [],
-                                allocation)
+                                us_top10_rows, [],
+                                us_top3_rows, [],
+                                allocation, stories=us_stories)
     kr_blog = render_blog_post(date_str, market_grp, market_interpret,
-                                [], [prepare_row(r) for r in kr_top10],
-                                [], [prepare_row(r) for r in kr_top3],
-                                allocation)
+                                [], kr_top10_rows,
+                                [], kr_top3_rows,
+                                allocation, stories=kr_stories)
+    # 무료(랜딩) 페이지용 — 미국+한국 통합 카카오/블로그
+    free_kakao = render_kakao_message(date_str, market_grp, us_top3_rows, kr_top3_rows, allocation,
+                                       us_top10=us_top10_rows, kr_top10=kr_top10_rows, stories=all_stories)
+    free_blog = render_blog_post(date_str, market_grp, market_interpret,
+                                  us_top10_rows, kr_top10_rows,
+                                  us_top3_rows, kr_top3_rows,
+                                  allocation, stories=all_stories)
 
     # 11. 보고서 렌더링
 
@@ -1207,6 +1156,7 @@ def main() -> int:
         krx_highlights=prepare_highlights(krx_hi_10),
         allocation=allocation,
         stats=stats,
+        kakao=free_kakao, blog=free_blog,
     )
     free_path = args.output_dir / "si_investment_report.html"
     free_path.write_text(free_html, encoding='utf-8')
@@ -1252,12 +1202,6 @@ def main() -> int:
     kr_path = args.output_dir / "korea_premium_report.html"
     kr_path.write_text(kr_prem_html, encoding='utf-8')
     log.info("  ✓ %s (%d bytes)", kr_path.name, kr_path.stat().st_size)
-
-    # 11-4 포트폴리오 현재가 (my_tickers.txt 보유 종목)
-    try:
-        generate_portfolio_prices(args.output_dir)
-    except Exception as e:
-        log.warning("포트폴리오 시세 생성 실패(무시하고 계속): %s", e)
 
     log.info("=" * 60)
     log.info("  완료. 미국 %d/%d, 한국 %d/%d, 미국 펀더멘털 %d개",
