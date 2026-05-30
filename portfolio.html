@@ -300,18 +300,18 @@ function render(){
     var d2=p.currency==="USD"?2:0;
     var priceCell=p.assetType==="cash"?'<span class="muted">-</span>':
       fe?'<span class="up num">'+sy+fmt(pr,d2)+'</span>':
-      '<input data-fid="'+p.id+'" data-field="manualPrice" class="in-md num" style="border-color:rgba(251,191,36,.5);color:#fbbf24" type="number" step="any" placeholder="직접입력" value="'+esc(p.manualPrice)+'" oninput="upd(\''+p.id+'\',\'manualPrice\',this.value)">';
+      '<input data-fid="'+p.id+'" data-field="manualPrice" class="in-md num" style="border-color:rgba(251,191,36,.5);color:#fbbf24" type="text" inputmode="decimal" placeholder="직접입력" value="'+esc(p.manualPrice)+'" oninput="upd(\''+p.id+'\',\'manualPrice\',this.value)">';
     // 목표가·손절가: 사용자가 안 넣으면 추천값을 회색 placeholder로
     var tgtPH = (a.targetAuto && a.target>0) ? '추천 '+fmt(a.target,d2) : '목표가';
     var stpPH = (a.stopAuto && a.stop>0) ? '추천 '+fmt(a.stop,d2) : '손절가';
     return '<tr>'+
       '<td><input data-fid="'+p.id+'" data-field="ticker" class="in-tk num" value="'+esc(p.ticker)+'" placeholder="AAPL" oninput="upd(\''+p.id+'\',\'ticker\',this.value)"></td>'+
       '<td><select onchange="upd(\''+p.id+'\',\'assetType\',this.value)"><option value="stock"'+(p.assetType==="stock"?" selected":"")+'>주식</option><option value="ETF"'+(p.assetType==="ETF"?" selected":"")+'>ETF</option><option value="cash"'+(p.assetType==="cash"?" selected":"")+'>현금</option></select></td>'+
-      '<td><input data-fid="'+p.id+'" data-field="qty" class="in-sm num" type="number" step="any" value="'+esc(p.qty)+'" oninput="upd(\''+p.id+'\',\'qty\',this.value)"></td>'+
-      '<td><input data-fid="'+p.id+'" data-field="avg" class="in-md num" type="number" step="any" value="'+esc(p.avg)+'" oninput="upd(\''+p.id+'\',\'avg\',this.value)"></td>'+
+      '<td><input data-fid="'+p.id+'" data-field="qty" class="in-sm num" type="text" inputmode="decimal" value="'+esc(p.qty)+'" oninput="upd(\''+p.id+'\',\'qty\',this.value)"></td>'+
+      '<td><input data-fid="'+p.id+'" data-field="avg" class="in-md num" type="text" inputmode="decimal" value="'+esc(p.avg)+'" oninput="upd(\''+p.id+'\',\'avg\',this.value)"></td>'+
       '<td>'+priceCell+'</td>'+
-      '<td><input data-fid="'+p.id+'" data-field="target" class="in-md num" type="number" step="any" value="'+esc(p.target)+'" placeholder="'+tgtPH+'" oninput="upd(\''+p.id+'\',\'target\',this.value)"></td>'+
-      '<td><input data-fid="'+p.id+'" data-field="stop" class="in-md num" type="number" step="any" value="'+esc(p.stop)+'" placeholder="'+stpPH+'" oninput="upd(\''+p.id+'\',\'stop\',this.value)"></td>'+
+      '<td><input data-fid="'+p.id+'" data-field="target" class="in-md num" type="text" inputmode="decimal" value="'+esc(p.target)+'" placeholder="'+tgtPH+'" oninput="upd(\''+p.id+'\',\'target\',this.value)"></td>'+
+      '<td><input data-fid="'+p.id+'" data-field="stop" class="in-md num" type="text" inputmode="decimal" value="'+esc(p.stop)+'" placeholder="'+stpPH+'" oninput="upd(\''+p.id+'\',\'stop\',this.value)"></td>'+
       '<td class="num" style="color:'+(a.roi>=0?"#34d399":"#fb7185")+'">'+(p.assetType==="cash"?"-":pct(a.roi))+'</td>'+
       '<td class="num">'+(a.weight||0).toFixed(1)+'%</td>'+
       '<td class="num">'+(a.rr!=null?a.rr.toFixed(2):"-")+'</td>'+
@@ -390,8 +390,8 @@ function simBlock(c){
   var p=S.positions.filter(function(x){return x.id===S.sim.id;})[0];
   if(!p)return html+'<p class="muted" style="font-size:13px">종목을 선택하면 추가매수 후 평단가·비중·수익률 변화를 계산합니다.</p>';
   html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">'+
-    '<div><div class="muted" style="font-size:12px;margin-bottom:4px">추가 매수 수량</div><input class="num" style="width:100%" type="number" step="any" value="'+esc(S.sim.addQty)+'" oninput="S.sim.addQty=this.value;render()"></div>'+
-    '<div><div class="muted" style="font-size:12px;margin-bottom:4px">추가 매수 가격</div><input class="num" style="width:100%" type="number" step="any" value="'+esc(S.sim.addPrice)+'" oninput="S.sim.addPrice=this.value;render()"></div></div>';
+    '<div><div class="muted" style="font-size:12px;margin-bottom:4px">추가 매수 수량</div><input class="num" style="width:100%" type="text" inputmode="decimal" value="'+esc(S.sim.addQty)+'" oninput="S.sim.addQty=this.value;render()"></div>'+
+    '<div><div class="muted" style="font-size:12px;margin-bottom:4px">추가 매수 가격</div><input class="num" style="width:100%" type="text" inputmode="decimal" value="'+esc(S.sim.addPrice)+'" oninput="S.sim.addPrice=this.value;render()"></div></div>';
   var addQty=num(S.sim.addQty),addPrice=num(S.sim.addPrice);
   if(addQty>0){
     var cur=priceOf(p),oq=num(p.qty),oa=num(p.avg),nq=oq+addQty,na=(oq*oa+addQty*addPrice)/nq;
@@ -420,7 +420,7 @@ function upd(id,field,val){
   // 입력 중 커서가 날아가지 않도록: 즉시 render 대신 디바운스 + 포커스 복원
   clearTimeout(window._renderT);
   window._focusInfo={id:id,field:field};
-  window._renderT=setTimeout(function(){ render(); restoreFocus(); }, 400);
+  window._renderT=setTimeout(function(){ render(); restoreFocus(); }, 1200);
 }
 // render 후, 방금 입력하던 칸으로 포커스 복원 (값·커서 보존)
 function restoreFocus(){
