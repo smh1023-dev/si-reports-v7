@@ -104,6 +104,8 @@ function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return
 function fmt(v,d){d=d||0; if(v==null||isNaN(v))return "-"; return Number(v).toLocaleString("ko-KR",{minimumFractionDigits:d,maximumFractionDigits:d});}
 function pct(v,d){d=(d==null?1:d); if(v==null||isNaN(v))return "-"; return (v>=0?"+":"")+Number(v).toFixed(d)+"%";}
 function sym(c){return c==="KRW"?"₩":"$";}
+// 종목 통화 판별: 한국주식(.KS/.KQ)은 무조건 원화, 아니면 시세기록 통화, 없으면 저장값
+function curOf(p){ var t=(p&&p.ticker?p.ticker:"").toUpperCase(); if(/\.K[SQ]$/.test(t)) return "KRW"; var r=getRec(p); if(r&&r.currency) return r.currency; return (p&&p.currency)||"USD"; }
 function stamp(){var d=new Date();var k=new Date(d.getTime()+(540+d.getTimezoneOffset())*60000);
   function p(n){return String(n).padStart(2,"0");}
   return k.getFullYear()+"-"+p(k.getMonth()+1)+"-"+p(k.getDate())+" "+p(k.getHours())+":"+p(k.getMinutes());}
@@ -296,8 +298,8 @@ function render(){
     '<span style="color:#fbbf24">⚠ 현재가 데이터를 찾지 못했습니다. 종목별 현재가를 직접 입력하세요. (사이트 업로드 후엔 매일 아침 자동 갱신)</span>';
 
   var rows=S.positions.map(function(p){
-    var a=c.A[p.id], pr=priceOf(p), fe=fetched(p), sy=sym(p.currency);
-    var d2=p.currency==="USD"?2:0;
+    var a=c.A[p.id], pr=priceOf(p), fe=fetched(p), cur=curOf(p), sy=sym(cur);
+    var d2=cur==="USD"?2:0;
     var priceCell=p.assetType==="cash"?'<span class="muted">-</span>':
       fe?'<span class="up num">'+sy+fmt(pr,d2)+'</span>':
       '<input data-fid="'+p.id+'" data-field="manualPrice" class="in-md num" style="border-color:rgba(251,191,36,.5);color:#fbbf24" type="text" inputmode="decimal" placeholder="직접입력" value="'+esc(p.manualPrice)+'" oninput="upd(\''+p.id+'\',\'manualPrice\',this.value)">';
@@ -324,7 +326,7 @@ function render(){
   // 매수/매도 제안
   var actionable=S.positions.filter(function(p){return p.assetType!=="cash"&&["buy","trim","danger"].indexOf(c.A[p.id].tone)>=0;});
   var adviceHTML=actionable.length===0?'<p class="muted" style="font-size:13px">현재 액션 권장 종목이 없습니다. (전체 관망/보유)</p>':
-    actionable.map(function(p){var a=c.A[p.id],sy=sym(p.currency),d2=p.currency==="USD"?2:0;
+    actionable.map(function(p){var a=c.A[p.id],cur=curOf(p),sy=sym(cur),d2=cur==="USD"?2:0;
       var ex=a.tone==="buy"?
         '<div>1차 매수가 <b class="up">'+sy+fmt(a.buy1,d2)+'</b></div><div>2차 매수가 <b class="up">'+sy+fmt(a.buy2,d2)+'</b></div>'+
         '<div style="grid-column:1/3;margin-top:2px">👉 <b class="up">약 '+fmt(a.recBuyShares)+'주</b> 추가매수 (≈'+fmt(a.recBuy)+')</div>':
@@ -396,9 +398,9 @@ function simBlock(c){
   if(addQty>0){
     var cur=priceOf(p),oq=num(p.qty),oa=num(p.avg),nq=oq+addQty,na=(oq*oa+addQty*addPrice)/nq;
     var nmv=nq*cur,ntot=c.total-oq*cur+nmv,nw=ntot>0?nmv/ntot*100:0;
-    var or=oa>0?(cur-oa)/oa*100:0,nr=na>0?(cur-na)/na*100:0,ow=c.total>0?oq*cur/c.total*100:0,sy=sym(p.currency);
+    var or=oa>0?(cur-oa)/oa*100:0,nr=na>0?(cur-na)/na*100:0,ow=c.total>0?oq*cur/c.total*100:0,sy=sym(curOf(p));
     html+='<div style="background:var(--panel2);border-radius:12px;padding:12px">'+
-      simrow("변경 후 평단가",sy+fmt(na,p.currency==="USD"?2:0))+
+      simrow("변경 후 평단가",sy+fmt(na,curOf(p)==="USD"?2:0))+
       simrow("변경 후 비중",ow.toFixed(1)+"% → "+nw.toFixed(1)+"%")+
       simrow("예상 수익률",pct(or)+" → "+pct(nr),nr>=0?"#34d399":"#fb7185")+
       simrow("변경 후 수량",fmt(nq))+'</div>';
@@ -415,7 +417,7 @@ function autoLevels(p){
   var avg=num(p.avg); if(avg<=0) return p;
   var up={conservative:0.15,moderate:0.25,aggressive:0.40}[S.profile]||0.25;
   var dn={conservative:0.07,moderate:0.10,aggressive:0.15}[S.profile]||0.10;
-  var d=(p.currency==="USD")?2:0, f=Math.pow(10,d);
+  var d=(curOf(p)==="USD")?2:0, f=Math.pow(10,d);
   var tgtAuto=(p._tgtAuto===true)||(p._tgtAuto==null && num(p.target)<=0);
   var stpAuto=(p._stpAuto===true)||(p._stpAuto==null && num(p.stop)<=0);
   if(tgtAuto){ p.target=String(Math.round(avg*(1+up)*f)/f); p._tgtAuto=true; }
@@ -426,7 +428,7 @@ function autoLevels(p){
 
 // ── 금액 칸: 평소엔 ₩/$ 콤마 표시, 클릭하면 입력 ──
 function findPos(id){for(var i=0;i<S.positions.length;i++){if(S.positions[i].id===id)return S.positions[i];}return null;}
-function dispMoney(p,field){var v=num(p[field]); if(p[field]===""||p[field]==null||v<=0) return ""; var d2=p.currency==="USD"?2:0; return sym(p.currency)+fmt(v,d2);}
+function dispMoney(p,field){var v=num(p[field]); if(p[field]===""||p[field]==null||v<=0) return ""; var cur=curOf(p); var d2=cur==="USD"?2:0; return sym(cur)+fmt(v,d2);}
 function cellFocus(el,id,field){var p=findPos(id); if(!p)return; el.value=(p[field]==null?"":String(p[field])); try{var L=el.value.length;el.setSelectionRange(L,L);}catch(e){}}
 function updSilent(id,field,val){
   S.positions=S.positions.map(function(p){
