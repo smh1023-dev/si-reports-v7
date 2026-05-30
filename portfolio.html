@@ -408,11 +408,31 @@ function simBlock(c){
 function simrow(k,v,col){return '<div class="simrow"><span class="k">'+k+'</span><span class="num" style="font-weight:700;color:'+(col||"#e6edf5")+'">'+v+'</span></div>';}
 
 // ── 이벤트 핸들러 (전역) ──
+
+// ── 평단가 기준 목표가·손절가 자동 채움 (성향별 비율) ──
+function autoLevels(p){
+  if(!p || p.assetType==="cash") return p;
+  var avg=num(p.avg); if(avg<=0) return p;
+  var up={conservative:0.15,moderate:0.25,aggressive:0.40}[S.profile]||0.25;
+  var dn={conservative:0.07,moderate:0.10,aggressive:0.15}[S.profile]||0.10;
+  var d=(p.currency==="USD")?2:0, f=Math.pow(10,d);
+  var tgtAuto=(p._tgtAuto===true)||(p._tgtAuto==null && num(p.target)<=0);
+  var stpAuto=(p._stpAuto===true)||(p._stpAuto==null && num(p.stop)<=0);
+  if(tgtAuto){ p.target=String(Math.round(avg*(1+up)*f)/f); p._tgtAuto=true; }
+  if(stpAuto){ p.stop  =String(Math.round(avg*(1-dn)*f)/f); p._stpAuto=true; }
+  return p;
+}
+
 function upd(id,field,val){
   S.positions=S.positions.map(function(p){
     if(p.id!==id)return p;
     var np={}; for(var k in p)np[k]=p[k]; np[field]=val;
     if(field==="ticker"){var t=val.trim().toUpperCase();var r=S.prices[t];if(r){np.name=r.name;np.assetType=r.assetType;np.currency=r.currency;}}
+    // 사용자가 목표가/손절가를 직접 건드리면 자동채움 해제(비우면 다시 자동)
+    if(field==="target"){ np._tgtAuto=(String(val).trim()===""); }
+    if(field==="stop"){ np._stpAuto=(String(val).trim()===""); }
+    // 평단가/티커/유형이 바뀌면 목표가·손절가 자동 재계산
+    if(field==="avg"||field==="ticker"||field==="assetType"){ autoLevels(np); }
     return np;
   });
   persist();
@@ -435,7 +455,7 @@ function restoreFocus(){
 }
 function addRow(){S.positions.push({id:uid(),ticker:"",name:"",assetType:"stock",currency:"USD",qty:"",avg:"",target:"",stop:"",memo:"",manualPrice:""});persist();render();}
 function del(id){S.positions=S.positions.filter(function(p){return p.id!==id;});if(S.sim.id===id)S.sim={id:null,addQty:"",addPrice:""};persist();render();}
-function setProfile(v){S.profile=v;persist();render();}
+function setProfile(v){S.profile=v;S.positions=S.positions.map(function(p){return autoLevels(p);});persist();render();}
 function openSim(id){var p=S.positions.filter(function(x){return x.id===id;})[0];S.sim={id:id||null,addQty:"",addPrice:p?String(priceOf(p)||""):""};render();}
 function saveProxy(){var v=(S.proxyInput||"").trim().replace(/\/+$/,"");S.proxy=v;if(v)localStorage.setItem(LS_PROXY,v);else localStorage.removeItem(LS_PROXY);loadPrices();}
 function saveToday(){
