@@ -307,11 +307,11 @@ function render(){
     return '<tr>'+
       '<td><input data-fid="'+p.id+'" data-field="ticker" class="in-tk num" value="'+esc(p.ticker)+'" placeholder="AAPL" oninput="upd(\''+p.id+'\',\'ticker\',this.value)"></td>'+
       '<td><select onchange="upd(\''+p.id+'\',\'assetType\',this.value)"><option value="stock"'+(p.assetType==="stock"?" selected":"")+'>주식</option><option value="ETF"'+(p.assetType==="ETF"?" selected":"")+'>ETF</option><option value="cash"'+(p.assetType==="cash"?" selected":"")+'>현금</option></select></td>'+
-      '<td><input data-fid="'+p.id+'" data-field="qty" class="in-sm num" type="text" inputmode="decimal" value="'+esc(p.qty)+'" oninput="upd(\''+p.id+'\',\'qty\',this.value)"></td>'+
-      '<td><input data-fid="'+p.id+'" data-field="avg" class="in-md num" type="text" inputmode="decimal" value="'+esc(p.avg)+'" oninput="upd(\''+p.id+'\',\'avg\',this.value)"></td>'+
+      '<td><input data-fid="'+p.id+'" data-field="qty" class="in-sm num" type="text" inputmode="decimal" value="'+esc(p.qty)+'" oninput="updSilent(\''+p.id+'\',\'qty\',this.value)" onblur="cellBlur(this)"></td>'+
+      '<td><input data-fid="'+p.id+'" data-field="avg" class="in-md num" type="text" inputmode="decimal" placeholder="평단가" value="'+esc(dispMoney(p,"avg"))+'" onfocus="cellFocus(this,\''+p.id+'\',\'avg\')" oninput="updSilent(\''+p.id+'\',\'avg\',this.value)" onblur="cellBlur(this)"></td>'+
       '<td>'+priceCell+'</td>'+
-      '<td><input data-fid="'+p.id+'" data-field="target" class="in-md num" type="text" inputmode="decimal" value="'+esc(p.target)+'" placeholder="'+tgtPH+'" oninput="upd(\''+p.id+'\',\'target\',this.value)"></td>'+
-      '<td><input data-fid="'+p.id+'" data-field="stop" class="in-md num" type="text" inputmode="decimal" value="'+esc(p.stop)+'" placeholder="'+stpPH+'" oninput="upd(\''+p.id+'\',\'stop\',this.value)"></td>'+
+      '<td><input data-fid="'+p.id+'" data-field="target" class="in-md num" type="text" inputmode="decimal" placeholder="'+tgtPH+'" value="'+esc(dispMoney(p,"target"))+'" onfocus="cellFocus(this,\''+p.id+'\',\'target\')" oninput="updSilent(\''+p.id+'\',\'target\',this.value)" onblur="cellBlur(this)"></td>'+
+      '<td><input data-fid="'+p.id+'" data-field="stop" class="in-md num" type="text" inputmode="decimal" placeholder="'+stpPH+'" value="'+esc(dispMoney(p,"stop"))+'" onfocus="cellFocus(this,\''+p.id+'\',\'stop\')" oninput="updSilent(\''+p.id+'\',\'stop\',this.value)" onblur="cellBlur(this)"></td>'+
       '<td class="num" style="color:'+(a.roi>=0?"#34d399":"#fb7185")+'">'+(p.assetType==="cash"?"-":pct(a.roi))+'</td>'+
       '<td class="num">'+(a.weight||0).toFixed(1)+'%</td>'+
       '<td class="num">'+(a.rr!=null?a.rr.toFixed(2):"-")+'</td>'+
@@ -422,6 +422,25 @@ function autoLevels(p){
   if(stpAuto){ p.stop  =String(Math.round(avg*(1-dn)*f)/f); p._stpAuto=true; }
   return p;
 }
+
+
+// ── 금액 칸: 평소엔 ₩/$ 콤마 표시, 클릭하면 입력 ──
+function findPos(id){for(var i=0;i<S.positions.length;i++){if(S.positions[i].id===id)return S.positions[i];}return null;}
+function dispMoney(p,field){var v=num(p[field]); if(p[field]===""||p[field]==null||v<=0) return ""; var d2=p.currency==="USD"?2:0; return sym(p.currency)+fmt(v,d2);}
+function cellFocus(el,id,field){var p=findPos(id); if(!p)return; el.value=(p[field]==null?"":String(p[field])); try{var L=el.value.length;el.setSelectionRange(L,L);}catch(e){}}
+function updSilent(id,field,val){
+  S.positions=S.positions.map(function(p){
+    if(p.id!==id)return p;
+    var np={};for(var k in p)np[k]=p[k];np[field]=val;
+    if(field==="target"){np._tgtAuto=(String(val).trim()==="");}
+    if(field==="stop"){np._stpAuto=(String(val).trim()==="");}
+    if(field==="avg"){autoLevels(np);}
+    return np;
+  });
+  persist();
+  clearTimeout(window._renderT); // 입력 중 화면 재그리기 방지
+}
+function cellBlur(el){ render(); }
 
 function upd(id,field,val){
   S.positions=S.positions.map(function(p){
