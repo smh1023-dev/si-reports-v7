@@ -88,7 +88,7 @@
 
 // ── 상수 ──
 var LS_KEY="sistory_pf_v2", LS_SNAP="sistory_pf_snap_v2", LS_PROXY="sistory_proxy_url";
-var DEFAULT_PROXY_URL=""; // 본인 Cloudflare Worker 주소를 넣으면 자동 연동
+var DEFAULT_PROXY_URL="https://solitary-night-56d7.smh1023.workers.dev"; // 본인 Cloudflare Worker 주소를 넣으면 자동 연동
 var PRICES_URL="./portfolio_prices.json";
 var RISK={conservative:{label:"보수적",maxW:20,rr:2.0},moderate:{label:"중립적",maxW:30,rr:1.5},aggressive:{label:"공격적",maxW:40,rr:1.2}};
 var TYPE_LABEL={stock:"주식",ETF:"ETF",cash:"현금"};
@@ -452,8 +452,6 @@ function resetAll(){if(!confirm("모든 보유 종목을 초기화할까요? (�
 restore();
 render();
 loadPrices();
-
-
 </script>
 </body>
 </html>
